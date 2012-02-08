@@ -1,3 +1,9 @@
+#==============================================================================
+#	LIBC build script
+#
+#		Author: Arvydas Sidorenko
+#==============================================================================
+
 # What is going to be compiled
 SOURCE	:= $(shell find `pwd` -type f -name "*.c" -print)
 # The object files to be produced

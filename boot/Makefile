@@ -1,5 +1,5 @@
 #==============================================================================
-#	Bootloader build script executed by top Makefile
+#	Bootloader build script
 #
 #		Author: Arvydas Sidorenko
 #==============================================================================

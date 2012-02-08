@@ -4,7 +4,7 @@
 #		Author: Arvydas Sidorenko
 #==============================================================================
 
-CFLAGS	+= -nostartfiles -masm=intel
+CFLAGS	+= -nostartfiles
 SOURCE	:= $(shell find `pwd` -type f -name "*.c" -print)
 OBJ		:= $(SOURCE:.c=.o)
 

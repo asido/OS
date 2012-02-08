@@ -30,8 +30,8 @@ jmp STAGE2_MAIN
 KernelImgName:	db "KERNEL     "	; MUST be 11 bytes
 
 ; uninitialized data
-KernelImgSizeLow: db 0
-KernelImgSizeHigh: db 0
+KernelImgSizeLow: dd 0
+KernelImgSizeHigh: dd 0
 MemKBLow: dd 0
 MemKBHigh: dd 0
 
@@ -117,7 +117,6 @@ STAGE3:
 	mov ss, ax
 	mov es, ax
 	mov esp, 0x90000	; stack begins from 0x90000
-	mov ax, GDT_CODE_DESC
 	sti
 
 	; map PDE and enable paging
@@ -163,7 +162,7 @@ STAGE3:
 	add esp, 0x4
 
 
-; Our sloppy 32-bit error handler ^^
+; Sloppy 32-bit error handler ^^
 .Error32:
 	; TODO: 32-bit PRINT function
 	cli			; clear interrupts to prevent triple faults

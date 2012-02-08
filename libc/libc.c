@@ -1,6 +1,8 @@
 /******************************************************************************
  *	Broken libc implementation ;)
- *		Just the functions I need with some custom stuff included.
+ *	Just the functions I need with some custom stuff included.
+ *
+ *		Author: Arvydas Sidorenko
  *****************************************************************************/
 
 #include "libc.h"
@@ -16,6 +18,9 @@ static int puts_(const char *text);
 		((chr) | (_color << 8))
 
 
+/*
+ * Clears the screen with background colors
+ */
 void clear_screen()
 {
 	int i;

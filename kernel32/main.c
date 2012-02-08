@@ -17,7 +17,7 @@ static char* logo =
 struct boot_info {
 	int mem_size;
 	int krnl_size;
-};
+} __attribute((__packed__))__;
 
 static int init_screen()
 {
@@ -36,19 +36,23 @@ static int init_hal(struct boot_info *binfo)
 /* Kernel entry point */
 int kmain(struct boot_info binfo)
 {
-	/* asm(".intel_syntax noprefix\n"); */
-	/* asm("cli\n"); */
-	/* asm("mov eax, 0x10\n");	 offset to 0x10 in GDT - data selector  */
-	/* asm("mov ds, ax\n"); */
-	/* asm("mov es, ax\n"); */
-	/* asm("mov fs, ax\n"); */
-	/* asm("mov gs, ax\n"); */
+	/* clear interrupts until we establish the handlers */
+	__asm__ __volatile__("cli": : :"memory");
+	/* set segment values */
+	__asm__ __volatile__("movw $0x10, %%ax \n"
+						 "movw %%ax, %%ds \n"
+						 "movw %%ax, %%es \n"
+						 "movw %%ax, %%fs \n"
+						 "movw %%ax, %%gs \n"
+						: : : "ax");
 
 	init_screen();
 	init_hal(&binfo);
 
 	goto_xy(10,10);
-	printf("memsize: %d\n", binfo.mem_size);
+	printf("Memory size: %dKb\n", binfo.mem_size);
+	goto_xy(10,11);
+	printf("Kernel size: %dKb\n", binfo.krnl_size);
 
 	for (;;);
 	return 0;
