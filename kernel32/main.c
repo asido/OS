@@ -17,7 +17,7 @@ static char* logo =
 struct boot_info {
 	int mem_size;
 	int krnl_size;
-} __attribute((__packed__))__;
+} __attribute__((__packed__));
 
 static int init_screen()
 {

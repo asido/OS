@@ -17,10 +17,10 @@ jmp STAGE2_MAIN
 ;------------------------------------
 ; Preprocessor directives
 ;------------------------------------
-%include "stdio16.inc"
-%include "gdt.inc"
-%include "mem16.inc"
-%include "fat12.inc"
+%include "stdio16.asm"
+%include "gdt.asm"
+%include "mem16.asm"
+%include "fat12.asm"
 
 ;------------------------------------
 ; DATA SECTION
@@ -101,8 +101,8 @@ PMode:
 ;-------------------------------------------------------------------
 [bits 32]	; Finally 32 bit world!
 
-%include "mem32.inc"
-%include "elf32.inc"
+%include "mem32.asm"
+%include "elf32.asm"
 
 ; uninitialized data
 MemorySize: dd 0
