@@ -1,0 +1,369 @@
+magic_break: enabled=1
+
+# You may now use double quotes around pathnames, in case
+# your pathname includes spaces.
+
+#=======================================================================
+# MEGS
+# how much memory the emulated machine will have.
+#
+# set this to the default number of Megabytes of memory you want
+# to emulate.  You may also pass the '-megs xyz' option to bochs
+#
+# The default is 32MB, most OS's won't need more than that....
+# reset it to 16 MB if you have only 64 MB on your system.
+#=======================================================================
+#megs: 256
+megs: 512
+#megs: 64
+# megs: 32
+#megs: 16
+#megs: 8
+
+#=======================================================================
+# ROMIMAGE:
+# You now need to load a ROM BIOS into F0000-FFFFF.  Most of the BIOS
+# 'hooks' have been replaced with real BIOS support in Bochs now.
+# Normally, you can use the precompiled BIOS named: BIOS-bochs-latest. 
+#=======================================================================
+#=======================================================================
+# VGAROMIMAGE
+# You now need to load a VGA ROM BIOS into C0000.
+#=======================================================================
+# filenames of ROM images used:
+
+romimage: file=bochs/BIOS-bochs-latest
+vgaromimage: file=bochs/VGABIOS-lgpl-latest
+
+#=======================================================================
+# FLOPPY DISKS:
+# Point this to pathname of floppy image file or device.
+#
+# You can set the initial status of the media to 'ejected' or 'inserted'.
+#   floppya: 2_88=path, status=ejected             (2.88M 3.5" floppy)
+#   floppya: 1_44=path, status=inserted            (1.44M 3.5" floppy)
+#   floppya: 1_2=path, status=ejected              (1.2M  5.25" floppy)
+#   floppya: 720k=path, status=inserted            (720K  3.5" floppy)
+#   floppya: 360k=path, status=inserted            (360K  5.25" floppy)
+#
+# The path should be the name of a disk image file.  On unix, you can use
+# a raw device name such as /dev/fd0 on Linux.  On WinNT and Win2k, use
+# drive letters such as a: or b: as the path.  Raw floppy access is not
+# supported on Windows 95 and 98.
+#=======================================================================
+#floppya: 1_44=/dev/fd0, status=inserted
+#floppya: file=../1.44, status=inserted
+#floppya: 1_44=/dev/fd0H1440, status=inserted
+#floppya: 1_2=../1_2, status=inserted
+#floppya: 1_44=a:, status=inserted
+#floppya: 1_44=a.img, status=inserted
+
+# what disk images will be used (our tomsrtbt file is "288.img"):
+
+floppya: 1_44=FLOPPY.IMG, status=inserted
+
+# If you want a second floppy image to play with, uncomment this line
+# after creating a blank floppy image file with bximage.exe:
+#floppyb: 1_44=b.img, status=inserted
+
+#=======================================================================
+# ATA0, ATA1, ATA2, ATA3
+# ATA controller for hard disks and cdroms
+#
+# ata[0-3]: enabled=[0|1], ioaddr1=addr, ioaddr2=addr, irq=number
+# 
+# These options enables up to 4 ata channels. For each channel
+# the two base io address and the irq must be specified.
+# 
+# ata0 is enabled by default, with ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14
+#
+# Examples:
+#   ata0: enabled=1, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14
+#   ata1: enabled=1, ioaddr1=0x170, ioaddr2=0x370, irq=15
+#   ata2: enabled=1, ioaddr1=0x1e8, ioaddr2=0x3e8, irq=11
+#   ata3: enabled=1, ioaddr1=0x168, ioaddr2=0x368, irq=9
+#=======================================================================
+
+# hard disk
+ata0: enabled=1, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14
+
+# Commenting these out is same as not enabling them:
+#ata1: enabled=0, ioaddr1=0x170, ioaddr2=0x370, irq=15
+#ata2: enabled=0, ioaddr1=0x1e8, ioaddr2=0x3e8, irq=11
+#ata3: enabled=0, ioaddr1=0x168, ioaddr2=0x368, irq=9
+
+# The hard drive itself is set up here:
+
+#=======================================================================
+# ATA[0-3]-MASTER, ATA[0-3]-SLAVE
+#
+# This defines the type and characteristics of all attached ata devices:
+#   type=       type of attached device [disk|cdrom] 
+#   path=       path of the image
+#   cylinders=  only valid for disks
+#   heads=      only valid for disks
+#   spt=        only valid for disks
+#   status=     only valid for cdroms [inserted|ejected]
+#   biosdetect= type of biosdetection [none|auto], only for disks on ata0 [cmos]
+#   translation=type of transation of the bios, only for disks [none|lba|large|rechs|auto]
+#   model=      string returned by identify device command
+#   
+# Point this at a hard disk image file, cdrom iso file, or physical cdrom
+# device.  To create a hard disk image, try running bximage.  It will help you
+# choose the size and then suggest a line that works with it.
+#
+# In UNIX it may be possible to use a raw device as a Bochs hard disk, 
+# but WE DON'T RECOMMEND IT.  In Windows there is no easy way.
+#
+# In windows, the drive letter + colon notation should be used for cdroms.
+# Depending on versions of windows and drivers, you may only be able to 
+# access the "first" cdrom in the system.  On MacOSX, use path="drive"
+# to access the physical drive.
+#
+# The path, cylinders, heads, and spt are mandatory for type=disk
+# The path is mandatory for type=cdrom
+#
+# Default values are:
+#   biosdetect=auto, translation=auto, model="Generic 1234"
+#
+# The biosdetect option has currently no effect on the bios
+#
+# Examples:
+#   ata0-master: type=disk, path=10M.sample, cylinders=306, heads=4, spt=17
+#   ata0-slave:  type=disk, path=20M.sample, cylinders=615, heads=4, spt=17
+#   ata1-master: type=disk, path=30M.sample, cylinders=615, heads=6, spt=17
+#   ata1-slave:  type=disk, path=46M.sample, cylinders=940, heads=6, spt=17
+#   ata2-master: type=disk, path=62M.sample, cylinders=940, heads=8, spt=17
+#   ata2-slave:  type=disk, path=112M.sample, cylinders=900, heads=15, spt=17
+#   ata3-master: type=disk, path=483M.sample, cylinders=1024, heads=15, spt=63
+#   ata3-slave:  type=cdrom, path=iso.sample, status=inserted
+#=======================================================================
+#ata0-master: type=disk, path="30M.sample", cylinders=615, heads=6, spt=17
+#ata0-slave: type=cdrom, path=D:, status=inserted
+#ata0-slave: type=cdrom, path=/dev/cdrom, status=inserted
+#ata0-slave: type=cdrom, path="drive", status=inserted
+
+# The DLX-Linux image uses these values:
+# ata0-master: type=disk, path="hd10meg.img", cylinders=306, heads=4, spt=17
+
+# The bximage.exe program that comes with BOCHS, defaults to this image:
+# ata0-master: type=disk, path="c.img", cylinders=20, heads=16, spt=63
+
+#=======================================================================
+# BOOT:
+# This defines your boot drive.  
+# You can either boot from 'floppy', 'disk' or 'cdrom'
+#
+# Examples:
+#   boot: floppy
+#   boot: disk
+#   boot: cdrom
+#=======================================================================
+#boot: c
+#boot: floppy
+#boot: disk
+
+boot: floppy
+
+#=======================================================================
+# FLOPPY_BOOTSIG_CHECK: disabled=[0|1]
+# Enables or disables the 0xaa55 signature check on boot floppies
+# Defaults to disabled=0
+# Examples:
+#   floppy_bootsig_check: disabled=0
+#   floppy_bootsig_check: disabled=1
+#=======================================================================
+#floppy_bootsig_check: disabled=1
+floppy_bootsig_check: disabled=0
+
+# default config interface is textconfig.
+#config_interface: textconfig
+
+#=======================================================================
+# LOG:
+# Give the path of the log file you'd like Bochs debug and misc. verbage
+# to be written to.  If you really don't want it, make it /dev/null. :^(
+#
+# Examples:
+#   log: ./bochs.out
+#   log: /dev/tty
+#=======================================================================
+#log: /dev/null
+
+# where do we send log messages?
+log: axidOS.log
+
+#=======================================================================
+# LOG CONTROLS
+#
+# Bochs now has four severity levels for event logging.
+#   panic: cannot proceed.  If you choose to continue after a panic, 
+#          don't be surprised if you get strange behavior or crashes.
+#   error: something went wrong, but it is probably safe to continue the
+#          simulation.
+#   info: interesting or useful messages.
+#   debug: messages useful only when debugging the code.  This may
+#          spit out thousands per second.
+#
+# For events of each level, you can choose to crash, report, or ignore.
+# TODO: allow choice based on the facility: e.g. crash on panics from
+#       everything except the cdrom, and only report those.
+#
+# If you are experiencing many panics, it can be helpful to change
+# the panic action to report instead of fatal.  However, be aware
+# that anything executed after a panic is uncharted territory and can 
+# cause bochs to become unstable.  The panic is a "graceful exit," so
+# if you disable it you may get a spectacular disaster instead.
+#=======================================================================
+panic: action=ask
+error: action=report
+info: action=report
+debug: action=ignore
+
+#=======================================================================
+# mouse: Not used in any of the GUI specific modules, but the option
+#        bx_options.mouse_enabled is set to this value.  The idea,
+#        is that the GUI code should not generate mouse events when
+#        not enabled.  The hardware emualation itself is not disabled
+#        by this.  This is to facilitate deterministic runs of bochs.
+#
+# Examples:
+#   mouse: enabled=1
+#   mouse: enabled=0
+#
+# I wouldn't recommend enabling the mouse by default, unless you have a
+# really good reason to do so.
+#=======================================================================
+# disable the mouse, since DLX is text only
+
+mouse: enabled=0
+
+#=======================================================================
+# KEYBOARD_MAPPING:
+# This enables a remap of a physical localized keyboard to a 
+# virtualized us keyboard, as the PC architecture expects.
+# If enabled, the keymap file must be specified.
+#
+# NOTE: In Bochs 1.4, keyboard mapping is only 100% implemented on X windows.
+# However, the key mapping tables are used in the paste function, so in the
+# DLX Linux example I'm enabling keyboard_mapping so that paste will work.
+# Cut & Paste is currently implemented on win32 and X windows only.
+# 
+# Examples:
+#   keyboard_mapping: enabled=1, map=gui/keymaps/x11-pc-de.map
+#=======================================================================
+
+# enable key mapping, using US layout as default.
+
+# keyboard_mapping: enabled=1, map=../keymaps/x11-pc-us.map
+
+#=======================================================================
+# USER_SHORTCUT:
+# This defines the keyboard shortcut to be sent when you press the "user"
+# button in the headerbar. The shortcut string can be a combination of
+# these key names: "alt", "ctrl", "del", "esc", "f1", "f4", "tab", "win".
+# Up to 3 keys can be pressed at a time.
+#
+# Example:
+#   user_shortcut: keys=ctrlaltdel
+#=======================================================================
+
+# We are using this "USER" button shortcut, since this is the only way I
+# know of to properly shutdown DLX-Linux per their manual:
+
+user_shortcut: keys=ctrlaltdel
+
+
+
+
+
+
+
+# DON'T WORRY ABOUT THE REST OF THESE FOR NOW (unless you have problems):
+#
+#=======================================================================
+# DEBUGGER_LOG:
+# Give the path of the log file you'd like Bochs to log debugger output.
+# If you really don't want it, make it /dev/null or '-'. :^(
+#
+# Examples:
+#   debugger_log: ./debugger.out
+#=======================================================================
+#debugger_log: /dev/null
+#debugger_log: debugger.out
+debugger_log: -
+
+#=======================================================================
+# VGA_UPDATE_INTERVAL:
+# Video memory is scanned for updates and screen updated every so many
+# virtual seconds.  The default is 300000, about 3Hz.  This is generally
+# plenty.  Keep in mind that you must tweak the 'ips:' directive
+# to be as close to the number of emulated instructions-per-second
+# your workstation can do, for this to be accurate.
+#
+# Examples:
+#   vga_update_interval: 250000
+#=======================================================================
+vga_update_interval: 300000
+
+#=======================================================================
+# KEYBOARD_SERIAL_DELAY:
+# Approximate time in microseconds that it takes one character to
+# be transfered from the keyboard to controller over the serial path.
+# Examples:
+#   keyboard_serial_delay: 200
+#=======================================================================
+keyboard_serial_delay: 250
+
+#=======================================================================
+# KEYBOARD_PASTE_DELAY:
+# Approximate time in microseconds between attempts to paste
+# characters to the keyboard controller. This leaves time for the
+# guest os to deal with the flow of characters.  The ideal setting
+# depends on how your operating system processes characters.  The
+# default of 100000 usec (.1 seconds) was chosen because it works 
+# consistently in Windows.
+#
+# If your OS is losing characters during a paste, increase the paste
+# delay until it stops losing characters.
+#
+# Examples:
+#   keyboard_paste_delay: 100000
+#=======================================================================
+keyboard_paste_delay: 100000
+
+#=======================================================================
+# FLOPPY_COMMAND_DELAY:
+# Time in microseconds to wait before completing some floppy commands
+# such as read/write/seek/etc, which normally have a delay associated.
+# I had this hardwired to 50,000 before.
+#
+# Examples:
+#   floppy_command_delay: 50000
+#
+# NOTE: Outputs 'old-style syntax detected' from now on
+#=======================================================================
+# floppy_command_delay: 500
+
+#=======================================================================
+# IPS:
+# Emulated Instructions Per Second.  This is the number of IPS that bochs
+# is capable of running on your machine.  Read the note in config.h
+# on how to find this.  Make sure to recompile after.
+#
+# IPS is used to calibrate many time-dependent events within the bochs 
+# simulation.  For example, changing IPS affects the frequency of VGA
+# updates, the duration of time before a key starts to autorepeat, and 
+# the measurement of BogoMips and other benchmarks.
+#
+# Examples:
+# Machine                                         Mips
+# ________________________________________________________________
+# 650Mhz Athlon K-7 with Linux 2.4.4/egcs-2.91.66 2 to 2.5 Mips
+# 400Mhz Pentium II with Linux 2.0.36/egcs-1.0.3  1 to 1.8 Mips
+# 166Mhz 64bit Sparc with Solaris 2.x             approx 0.75 Mips
+# 200Mhz Pentium with Linux 2.x                   approx 0.5 Mips
+#
+# NOTE: Outputs 'old-style syntax detected' from now on
+#=======================================================================
+# ips: 1000000
