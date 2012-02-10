@@ -4,6 +4,14 @@
 #		Author: Arvydas Sidorenko
 #==============================================================================
 
+# Check arch
+ARCH	= $(shell uname -m)
+ifneq ($(ARCH),x86_64)
+ifneq ($(ARCH),i686)
+$(error Your architecture is not supported)
+endif
+endif
+
 # Kernel executable name
 PROGRAM			= KERNEL
 
@@ -19,7 +27,7 @@ export CC		= gcc
 # Don't use -O2 optimization, it tripple faults the CPU !
 export CFLAGS	= -c -Wall -g -gstabs -Wextra -fno-builtin -nodefaultlibs -nostartfiles -nostdlib -m32 -mtune=pentium
 # libraries
-export CLIB		= -I $(PWD)/libc -I $(PWD)/kernel32 -I $(PWD)/drivers/keyboard
+export CLIB		=  -I $(PWD) -I $(PWD)/libc -I $(PWD)/kernel32 -I $(PWD)/drivers/keyboard
 
 # if 'werror=y' flag is specified, include -Werror flag for C compiler
 ifeq ($(werror),y)
@@ -36,13 +44,15 @@ LDFLAGS			= -T linker.ld -m elf_i386
 # o  print "Entering directory ...";
 MAKEFLAGS = -rR --no-print-directory
 
+
 # Default rule
 default:
 	cd boot; make
 	cd libc; make
-	cd drivers/keyboard; make
+	cd x86; make
 	cd kernel32; make
-	$(LD) $(LDFLAGS) -o $(PROGRAM) libc/*.o drivers/keyboard/*.o kernel32/*.o
+	cd drivers/keyboard; make
+	$(LD) $(LDFLAGS) -o $(PROGRAM) libc/*.o drivers/keyboard/*.o x86/*.o kernel32/*.o
 	./floppy.sh
 
 # Full rule, which first cleans all the build files and then does the build from scratch
