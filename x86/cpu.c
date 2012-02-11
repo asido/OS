@@ -5,6 +5,7 @@
  ******************************************************************************/
 
 #include "i8259.h"
+#include "i8253.h"
 #include "idt.h"
 #include "cpu.h"
 
@@ -200,6 +201,8 @@ int x86_init()
 	irq_disable();
 	/* initialize PIC controller */
 	if (i8259_init())
+		return -1;
+	if (i8253_init())
 		return -1;
 	/* register CPU handlers */
 	if (reg_cpu_handlers())

@@ -8,13 +8,12 @@
 #include "i8253.h"
 #include "i8259.h"
 
-/* TODO: PIT driver */
 
-/* PIT jiffy */
+/* interrupt jiffy */
 unsigned long long pit_jiffy = 0;
 
 /*
- * PIT interrupt handler
+ * PIT IRQ0 interrupt handler
  */
 void x86_i8253_irq_do_handle()
 {
@@ -23,4 +22,20 @@ void x86_i8253_irq_do_handle()
 	printf("%d", pit_jiffy);
 
 	irq_done(IRQ0_VECTOR);
+}
+
+static inline i8253_set_frequency()
+{
+	outportb(PIT_PORT_PIT_0, PIT_FREQ & 0xFF);
+	outportb(PIT_PORT_PIT_0, (PIT_FREQ >> 8) & 0xFF);
+}
+
+int i8253_init()
+{
+	outportb(PIT_PORT_MODE, PIT_CTRL_BCD_DEC |
+	                        PIT_CTRL_MODE_SQR_WAVE |
+	                        PIT_CTRL_RL_LEAST_MOST_SIG |
+	                        PIT_CTRL_SELECT_0);
+	i8253_set_frequency();
+	return 0;
 }
