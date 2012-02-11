@@ -8,7 +8,7 @@
 ARCH	= $(shell uname -m)
 ifneq ($(ARCH),x86_64)
 ifneq ($(ARCH),i686)
-$(error Your architecture is not supported)
+$(error $(ARCH) architecture is not supported)
 endif
 endif
 

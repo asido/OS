@@ -27,6 +27,7 @@
 
 /* End Of File character */
 #define EOF (-1)
+#define TAB_SIZE 4
 
 
 /* std functions */

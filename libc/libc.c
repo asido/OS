@@ -12,7 +12,8 @@ static char _color = 0;
 
 static int cursor_move(int cnt);
 static int cursor_move_line(int cnt);
-static int puts_(const char *text);
+static int _puts(const char *text);
+static inline void put_tab();
 
 #define CHAR_TO_MEMVAL(chr)	\
 		((chr) | (_color << 8))
@@ -135,7 +136,7 @@ int putchar(int c)
  */
 int puts(const char *text)
 {
-	puts_(text);
+	_puts(text);
 	putchar('\n');
 	return 0;
 }
@@ -143,12 +144,23 @@ int puts(const char *text)
 /*
  * Prints a null terminated char array on the screen without '\n'
  */
-static int puts_(const char *text)
+static int _puts(const char *text)
 {
 	while (*text)
 		if (putchar(*text++) == EOF)
 			return EOF;
 	return 0;
+}
+
+/*
+ * Prints tab space
+ */
+static inline void put_tab()
+{
+	int i;
+
+	for (i = 0; i < TAB_SIZE; i++)
+		putchar(' ');
 }
 
 /*
@@ -162,6 +174,15 @@ int printf(const char *format, ...)
 	
 	for (i = 0; format[i]; i++)
 	{
+		/* handle tab */
+		if (format[i] == '\t')
+		{
+			put_tab();
+			i++;
+			continue;
+		}
+
+		/* any non-special character just print out */
 		if (format[i] != '%')
 		{
 			putchar(format[i]);
@@ -179,7 +200,7 @@ int printf(const char *format, ...)
 			int val = va_arg(list, int);
 			char str[64];
 			itoa(val, str, 10);
-			puts_(str);
+			_puts(str);
 			break;
 		}
 		/* character */
@@ -191,14 +212,17 @@ int printf(const char *format, ...)
 		/* string */
 		case ('s'): {
 			char *val = va_arg(list, char *);
-			puts_(val);
+			_puts(val);
 			break;
 		}
 		/* hex */
 		case ('x'):
 		case ('X'): {
-			/* TODO */
-			return -2;		
+			int *val = va_arg(list, int);
+			char str[64];
+			itoa(val, str, 16);
+			_puts(str);
+			break;
 		}
 		default:
 			va_end(list);

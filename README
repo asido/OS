@@ -9,6 +9,7 @@ boot		: all bootloader files
 boot/inc	: utilities used by STAGE2 bootloader (STAGE1 can't use includes)
 drivers		: device drivers
 kernel32	: the kernel itself
+x86			: x86 architecture specific stuff
 libc		: custom libc implementations
 resources	: (if you have it) docs and manuals for my personal use.
 

@@ -1,2 +1,2 @@
 #!/bin/bash
-bochs -f bochs/bochs.bxrc
+./bochs-20120206/bochs -f bochs/bochs.bxrc

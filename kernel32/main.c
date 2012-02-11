@@ -5,10 +5,7 @@
  *****************************************************************************/
 
 #include <libc.h>
-#include <x86/i8259.h>
-#include <x86/idt.h>
-#include <x86/irq.h>
-
+#include <x86/cpu.h>
 
 static char* logo =
 "\
@@ -32,22 +29,9 @@ static int screen_init()
 	return 0;
 }
 
-static int x86_init(struct boot_info *binfo)
-{
-	i8259_init();
-	reg_irq(32, x86_i8253_irq_handle);
-	install_idt();
-	irq_enable();
-	
-	return binfo->mem_size;
-}
-
 /* Kernel entry point */
 int kmain(struct boot_info binfo)
 {
-	/* keep interrupts disabled until handlers are present */
-	irq_disable();
-
 	/* set segment values */
 	__asm__ __volatile__("movw $0x10, %%ax \n"
 						 "movw %%ax, %%ds \n"
@@ -56,8 +40,10 @@ int kmain(struct boot_info binfo)
 						 "movw %%ax, %%gs \n"
 						: : : "ax");
 
+	x86_init();
 	screen_init();
-	x86_init(&binfo);
+
+	/* int c = 5 / 0; */
 
 	goto_xy(10,10);
 	printf("Memory size: %dKb\n", binfo.mem_size);
