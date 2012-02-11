@@ -117,7 +117,6 @@ STAGE3:
 	mov ss, ax
 	mov es, ax
 	mov esp, 0x90000	; stack begins from 0x90000
-	sti
 
 	; map PDE and enable paging
 	call ENABLE_PAGING
