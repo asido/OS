@@ -24,7 +24,7 @@ void x86_i8253_irq_do_handle()
 	irq_done(IRQ0_VECTOR);
 }
 
-static inline i8253_set_frequency()
+static inline void i8253_set_frequency()
 {
 	outportb(PIT_PORT_PIT_0, PIT_FREQ & 0xFF);
 	outportb(PIT_PORT_PIT_0, (PIT_FREQ >> 8) & 0xFF);

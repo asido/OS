@@ -39,7 +39,8 @@
 #include <libc.h>
 #include "idt.h"
 
-static struct idt_t {
+
+struct idt_t {
 	unsigned short offset_low;
 	unsigned short segment_selector;
 	unsigned char reserved;
@@ -48,11 +49,10 @@ static struct idt_t {
 } __attribute__((__packed__));
 
 /* This will go into LIDT instruction */
-static struct idt_ptr {
+struct idt_ptr {
 	unsigned short limit;
 	unsigned int addr;
 } __attribute__((__packed__));
-
 
 static struct idt_t _idt[IDT_MAX_INTERRUPTS];
 

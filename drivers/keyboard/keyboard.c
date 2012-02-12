@@ -178,7 +178,7 @@
  * In my tests all emulators returned me Set 1 codes, so let's use it here.
  * (Might be because my host is set like that)
  */
-const static short SCAN_CODES_SINGLE_MAKE[] = {
+static const short SCAN_CODES_SINGLE_MAKE[] = {
 	[0x1]	= KEY_ESCAPE,
 	[0x2]	= KEY_1,
 	[0x3]	= KEY_2,
@@ -430,7 +430,7 @@ static char get_kbrd_status()
  */
 void x86_kbr_irq_do_handle()
 {
-	char status, buf;
+	unsigned char status, buf;
 
 repeat:
 	/* First check what state kbrd is in and if ready to give us something */

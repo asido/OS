@@ -47,4 +47,8 @@ struct x86_seg_reg_t {
 #define X86_PAGE_FAULT_IRQ 14
 #define X86_COPROC_IRQ 16
 
+int x86_init();
+inline void x86_cpu_halt();
+inline int x86_dump_registers();
+
 #endif /* end of include guard: CPU_N1YAILHP */

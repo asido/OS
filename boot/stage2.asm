@@ -155,6 +155,7 @@ STAGE3:
 
 	; and execute it!
 	cli
+	push DWORD KERNEL_PMODE_BASE
 	push DWORD [KernelImgSize]
 	push DWORD [MemorySize]
 	call eax

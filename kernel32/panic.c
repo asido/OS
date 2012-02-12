@@ -5,6 +5,7 @@
  ******************************************************************************/
 
 #include <libc.h>
+#include <x86/cpu.h>
 
 /*
  * Internal kernel error handler.

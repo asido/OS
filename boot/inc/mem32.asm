@@ -32,6 +32,7 @@ ENABLE_PAGING:
 	; initialize the first page table
 	mov edi, PTE_0_ADDR
 	mov ecx, PTE_COUNT
+	shr ecx, 2
 	xor eax, eax	; the physical address
 	or eax, PTE_FLAG
 .PTE_0_LOOP:

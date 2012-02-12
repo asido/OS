@@ -218,7 +218,7 @@ int printf(const char *format, ...)
 		/* hex */
 		case ('x'):
 		case ('X'): {
-			int *val = va_arg(list, int);
+			int val = va_arg(list, int);
 			char str[64];
 			itoa(val, str, 16);
 			_puts(str);
@@ -329,6 +329,7 @@ char *itoa(int value, char *str, int base)
 	if (base < 2 || base > 32)
 		return str;
 
+	/* TODO: 16-base should never be treated as negative */
 	if (value < 0)
 	{
 		if (base == 10)

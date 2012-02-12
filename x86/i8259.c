@@ -58,7 +58,7 @@ int i8259_init()
  * Informs the PIC that interrupt is done
  * and it can continue accepting the new ones.
  */
-inline void irq_done(int irq_line)
+inline int irq_done(int irq_line)
 {
 	if (!IS_PIC_LINE(irq_line))
 		return -1;
@@ -68,6 +68,8 @@ inline void irq_done(int irq_line)
 	/* but for slave, only if irq line belongs to it */
 	if (IS_PIC2_LINE(irq_line))
 		outportb(i8259_SLAVE_CMD_PORT, i8259_EOI_DATA);
+
+	return 0;
 }
 
 /*

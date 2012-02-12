@@ -33,6 +33,8 @@
 		(IS_PIC1_LINE(irq_line) || IS_PIC2_LINE(irq_line))
 
 int i8259_init();
-void irq_done(int irq);
+int irq_done(int irq);
+inline int irq_disable();
+inline int irq_enable();
 
 #endif /* end of include guard: I8259_5UIR4IFN */

@@ -19,6 +19,7 @@ static char* logo =
 struct boot_info {
 	int mem_size;
 	int krnl_size;
+	int krnl_loc;
 } __attribute__((__packed__));
 
 static int screen_init()
@@ -50,7 +51,8 @@ int kmain(struct boot_info binfo)
 	printf("Memory size: %dKb\n", binfo.mem_size);
 	goto_xy(10,11);
 	printf("Kernel size: %dKb\n", binfo.krnl_size);
-
+	goto_xy(10,12);
+	printf("Kernel loc: 0x%x\n", binfo.krnl_loc);
 
 	for (;;);
 	return 0;

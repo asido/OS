@@ -4,6 +4,7 @@
  *			Author: Arvydas Sidorenko
  ******************************************************************************/
 
+#include <libc.h>
 #include "i8259.h"
 #include "i8253.h"
 #include "idt.h"
@@ -31,7 +32,7 @@ extern void x86_coproc_handle();
 extern void x86_i8253_irq_handle();
 extern void x86_kbr_irq_handle();
 
-extern int x86_kbrd_init();
+extern int kbrd_init();
 
 static int _dump_registers(struct x86_reg_t *regs);
 static inline int x86_get_seg_regs(struct x86_seg_reg_t *buf);
@@ -39,7 +40,7 @@ static inline int x86_get_registers(struct x86_reg_t *buf);
 static inline int x86_get_gp_regs(struct x86_reg_t *buf);
 static inline int x86_get_seg_regs(struct x86_seg_reg_t *buf);
 
-const static struct x86_seg_reg_t  null_seg_regs = {
+static const struct x86_seg_reg_t  null_seg_regs = {
 	.cs = 0,
 	.ds = 0,
 	.ss = 0,
@@ -48,7 +49,7 @@ const static struct x86_seg_reg_t  null_seg_regs = {
 	.gs = 0
 };
 
-const static struct x86_reg_t null_regs = {
+static const struct x86_reg_t null_regs = {
 	.eax = 0,
 	.ebx = 0,
 	.ecx = 0,
@@ -58,7 +59,7 @@ const static struct x86_reg_t null_regs = {
 	.ebp = 0,
 	.esp = 0,
 	.eip = 0,
-	.seg_reg = &null_seg_regs
+	.seg_reg = NULL//&null_seg_regs
 };
 
 
@@ -66,7 +67,7 @@ static inline int x86_get_registers(struct x86_reg_t *buf)
 {
 	/* TODO: BROKEN! Need all this done in pure ASM */
 	x86_get_gp_regs(buf);
-	x86_get_seg_regs(buf);
+	x86_get_seg_regs(buf->seg_reg);
 
 	return 0;
 }
@@ -106,7 +107,7 @@ static inline int x86_get_seg_regs(struct x86_seg_reg_t *buf)
 /*
  * Dumps register values.
  */
-int inline x86_dump_registers()
+inline int x86_dump_registers()
 {
 	struct x86_reg_t regs = null_regs;
 	/* TODO: kinda lousy and pointless implementation since the actual
