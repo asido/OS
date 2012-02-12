@@ -6,6 +6,7 @@
 
 #include <libc.h>
 #include <x86/cpu.h>
+#include <x86/i8259.h>
 
 static char* logo =
 "\
@@ -40,8 +41,8 @@ int kmain(struct boot_info binfo)
 						 "movw %%ax, %%gs \n"
 						: : : "ax");
 
-	x86_init();
 	screen_init();
+	x86_init();
 
 	/* int c = 5 / 0; */
 

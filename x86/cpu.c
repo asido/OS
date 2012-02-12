@@ -29,6 +29,9 @@ extern void x86_coproc_handle();
 
 /* PIC interrupt handlers */
 extern void x86_i8253_irq_handle();
+extern void x86_kbr_irq_handle();
+
+extern int x86_kbrd_init();
 
 static int _dump_registers(struct x86_reg_t *regs);
 static inline int x86_get_seg_regs(struct x86_seg_reg_t *buf);
@@ -192,6 +195,16 @@ static int reg_cpu_handlers()
 	return 0;
 }
 
+static int reg_pic_handlers()
+{
+	if (reg_irq(IRQ0_VECTOR, x86_i8253_irq_handle))
+		return -1;
+	if (reg_irq(IRQ1_VECTOR, x86_kbr_irq_handle))
+		return -1;
+
+	return 0;
+}
+
 /*
  * Top CPU initialization routine.
  */
@@ -202,12 +215,17 @@ int x86_init()
 	/* initialize PIC controller */
 	if (i8259_init())
 		return -1;
+	/* initialize PIT controller */
 	if (i8253_init())
 		return -1;
-	/* register CPU handlers */
+	/* register interrupt handlers */
 	if (reg_cpu_handlers())
 		return -1;
-	reg_irq(32, x86_i8253_irq_handle);
+	if (reg_pic_handlers())
+		return -1;
+	/* initialize keyboard driver */
+	if (kbrd_init())
+		return -1;
 
 	/* install IDT */
 	if (install_idt())

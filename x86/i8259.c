@@ -60,12 +60,14 @@ int i8259_init()
  */
 inline void irq_done(int irq_line)
 {
-	if (irq_line < 0 || irq_line > IDT_MAX_INTERRUPTS)
+	if (!IS_PIC_LINE(irq_line))
 		return -1;
 
-	/* Inform both PICs */
+	/* master PIC needs to be informed in all cases */
 	outportb(i8259_MASTER_CMD_PORT, i8259_EOI_DATA);
-	outportb(i8259_SLAVE_CMD_PORT, i8259_EOI_DATA);
+	/* but for slave, only if irq line belongs to it */
+	if (IS_PIC2_LINE(irq_line))
+		outportb(i8259_SLAVE_CMD_PORT, i8259_EOI_DATA);
 }
 
 /*

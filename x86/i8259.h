@@ -25,6 +25,13 @@
 #define IRQ14_VECTOR	(IRQ0_VECTOR + 14)
 #define IRQ15_VECTOR	(IRQ0_VECTOR + 15)
 
+#define IS_PIC1_LINE(irq_line)	\
+		((irq_line >= IRQ0_VECTOR) && (irq_line <= IRQ7_VECTOR))
+#define IS_PIC2_LINE(irq_line)	\
+		((irq_line >= IRQ8_VECTOR) && (irq_line <= IRQ15_VECTOR))
+#define IS_PIC_LINE(irq_line)	\
+		(IS_PIC1_LINE(irq_line) || IS_PIC2_LINE(irq_line))
+
 int i8259_init();
 void irq_done(int irq);
 
