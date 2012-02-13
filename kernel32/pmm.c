@@ -42,8 +42,8 @@ enum ALIGN {
 };
 
 struct pmm_t {
-	int block_cnt;
-	int blocks_free;
+	unsigned int block_cnt;
+	unsigned int blocks_free;
 };
 
 static struct pmm_t pmm;
@@ -83,16 +83,6 @@ static void unset_bit(size_t idx)
 	mem_bitmap[map_idx] = UNSET_BIT(mem_bitmap[map_idx], bit_idx);
 }
 
-static char get_bit(size_t idx)
-{
-	size_t map_idx, bit_idx;
-
-	map_idx = BLOCK_IDX_TO_BITMAP_IDX(idx);
-	bit_idx = BLOCK_IDX_TO_BIT_OFFSET(idx);
-
-	return GET_BIT(mem_bitmap[map_idx], bit_idx);
-}
-
 inline static int is_map_idx_full(unsigned int idx)
 {
 	return mem_bitmap[idx] == 0xFF;
@@ -110,7 +100,7 @@ static unsigned int get_free_bit(char val)
 
 static unsigned int find_free_block()
 {
-	int i;
+	size_t i;
 
 	if (!pmm.blocks_free)
 		return -1;
@@ -150,7 +140,7 @@ unsigned int pmm_alloc()
 
 int pmm_dealloc(unsigned int addr)
 {
-	int idx = MEM_TO_BLOCK_IDX(addr);
+	size_t idx = MEM_TO_BLOCK_IDX(addr);
 	if (idx > pmm.block_cnt)
 		return -1;
 	unset_bit(idx);
@@ -166,15 +156,16 @@ int pmm_dealloc(unsigned int addr)
 int pmm_init_region(unsigned int addr, size_t size)
 {
 	size_t i, block_cnt;
-	int block_idx;
+	unsigned int block_idx;
 		
 	block_idx = MEM_TO_BLOCK_IDX(addr);
 	block_cnt = SIZE_B_TO_BLOCKS(size);
 
 	for (i = 0;
-         i < block_cnt, block_idx + i < pmm.block_cnt;
+         (i < block_cnt) || (block_idx + i < pmm.block_cnt);
          i++, addr += BLOCK_SIZE)
 		pmm_dealloc(addr);
+	return i;
 }
 
 

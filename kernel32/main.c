@@ -8,7 +8,10 @@
 #include <x86/cpu.h>
 #include <x86/i8259.h>
 
+extern int pmm_init(unsigned int mem_kb);
+extern int pmm_init_region(unsigned int addr, size_t size);
 extern unsigned int pmm_alloc();
+extern int pmm_dealloc(unsigned int addr);
 
 static char* logo =
 "\
@@ -51,8 +54,8 @@ int kmain(struct boot_info binfo)
 	x86_init();
 
 	pmm_init(binfo.mem_size);
-
-	int mem_avail_begin = MB_TO_BYTE(5); /* 0-1MB - BIOS , 1-5MB - Kernel */
+	/* bootloader mappings:  0-1MB - BIOS , 1-5MB - Kernel */
+	int mem_avail_begin = MB_TO_BYTE(5);
 	int mem_avail_end = KB_TO_BYTE(binfo.mem_size);
 	pmm_init_region(mem_avail_begin, mem_avail_end - mem_avail_begin);
 	unsigned int alloc0 = pmm_alloc();
