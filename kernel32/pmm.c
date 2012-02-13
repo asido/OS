@@ -5,6 +5,7 @@
  ******************************************************************************/
 
 #include <libc.h>
+#include "mm.h"
 
 #define BLOCK_SIZE 4096 /* same size as VMM block size */
 #define BITMAP_BIT_CNT CHAR_BIT
@@ -17,12 +18,14 @@
 #define SIZE_KB_TO_BLOCKS(kb)	\
 	((kb) * 1024 / BLOCK_SIZE)
 #define SIZE_B_TO_BLOCKS(b)	\
-	((b) / BLOCK_SIZE)
+	((b) / BLOCK_SIZE + ((b) % BLOCK_SIZE != 0 ? 1 : 0))
 
 #define BLOCK_IDX_TO_BITMAP_IDX(b_idx)	\
 	((b_idx) / BITMAP_BIT_CNT)
 #define BLOCK_IDX_TO_BIT_OFFSET(b_idx)	\
 	((b_idx) % BITMAP_BIT_CNT)
+#define BITMAP_IDX_TO_BLOCK_IDX(block_idx)	\
+	((block_idx) * BITMAP_BIT_CNT)
 
 #define BLOCK_TO_MEM(idx)	\
 	((idx) * BLOCK_SIZE)
@@ -98,7 +101,24 @@ static unsigned int get_free_bit(char val)
 	return -1;
 }
 
-static unsigned int find_free_block()
+static int is_free_sequence(size_t block_idx, int block_cnt)
+{
+	int i, idx, offset;
+
+	idx = BLOCK_IDX_TO_BITMAP_IDX(block_idx);
+	offset = BLOCK_IDX_TO_BIT_OFFSET(block_idx);
+
+	for (i = 0; i < block_cnt; i++)
+	{
+		if (IS_BIT_FREE(mem_bitmap[idx], offset))
+			continue;
+		else
+			return 0;
+	}
+	return 1;
+}
+
+static unsigned int find_free_blocks(int count)
 {
 	size_t i;
 
@@ -111,7 +131,9 @@ static unsigned int find_free_block()
 			int free_bit = get_free_bit(mem_bitmap[i]);
 			if (free_bit < 0)
 				return -1;
-			return (i * BITMAP_BIT_CNT) + free_bit;
+			int bit_idx = BITMAP_IDX_TO_BLOCK_IDX(i) + free_bit;
+			if (is_free_sequence(bit_idx, count))
+				return bit_idx;
 		}
 
 	return -2;
@@ -121,19 +143,25 @@ static unsigned int find_free_block()
  * Allocated `size` of blocks starting from `start`
  * Returns negative on error, allocated size on success.
  */
-unsigned int pmm_alloc()
+unsigned int pmm_alloc(unsigned int bytes)
 {
-	int idx;
+	int i, idx, block_count;
 
-	if (!pmm.blocks_free)
+	if (!bytes)
+		return 0;
+
+	block_count = SIZE_B_TO_BLOCKS(bytes);
+
+	if (!pmm.blocks_free || pmm.blocks_free < block_count)
 		return -1;
 
-	idx = find_free_block();
+	idx = find_free_blocks(block_count);
 	if (idx <= 0)
 		return -2;
 
-	set_bit(idx);
-	pmm.blocks_free--;
+	pmm.blocks_free -= block_count;
+	for (i = 0; i < block_count; i++)
+		set_bit(idx+i);
 
 	return BLOCK_TO_MEM(idx);
 }

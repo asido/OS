@@ -58,9 +58,10 @@ int kmain(struct boot_info binfo)
 	int mem_avail_begin = MB_TO_BYTE(5);
 	int mem_avail_end = KB_TO_BYTE(binfo.mem_size);
 	pmm_init_region(mem_avail_begin, mem_avail_end - mem_avail_begin);
-	unsigned int alloc0 = pmm_alloc();
-	unsigned int alloc1 = pmm_alloc();
-	unsigned int alloc2 = pmm_alloc();
+	unsigned int alloc0 = pmm_alloc(15000);
+	unsigned int alloc1 = pmm_alloc(4096);
+	alloc1 = pmm_alloc(4097);
+	unsigned int alloc2 = pmm_alloc(0);
 
 	/* int c = 5 / 0; */
 
