@@ -8,6 +8,8 @@
 #include <x86/cpu.h>
 #include <x86/i8259.h>
 
+extern unsigned int pmm_alloc();
+
 static char* logo =
 "\
     ___              ____   ____\n\
@@ -17,9 +19,9 @@ static char* logo =
 /_/  |_|//\\\\||__//\\____/\\____/\n";
 
 struct boot_info {
-	int mem_size;
-	int krnl_size;
-	int krnl_loc;
+	unsigned int mem_size;
+	unsigned int krnl_size;
+	unsigned int krnl_loc;
 } __attribute__((__packed__));
 
 static int screen_init()
@@ -40,10 +42,22 @@ int kmain(struct boot_info binfo)
 						 "movw %%ax, %%es \n"
 						 "movw %%ax, %%fs \n"
 						 "movw %%ax, %%gs \n"
-						: : : "ax");
+						 /* stack at the top of the kernel's PTE */
+						 "movl $0xC0400000, %%eax \n"
+						 "movl %%eax, %%esp \n"
+						: : : "eax");
 
 	screen_init();
 	x86_init();
+
+	pmm_init(binfo.mem_size);
+
+	int mem_avail_begin = MB_TO_BYTE(5); /* 0-1MB - BIOS , 1-5MB - Kernel */
+	int mem_avail_end = KB_TO_BYTE(binfo.mem_size);
+	pmm_init_region(mem_avail_begin, mem_avail_end - mem_avail_begin);
+	unsigned int alloc0 = pmm_alloc();
+	unsigned int alloc1 = pmm_alloc();
+	unsigned int alloc2 = pmm_alloc();
 
 	/* int c = 5 / 0; */
 
@@ -53,6 +67,12 @@ int kmain(struct boot_info binfo)
 	printf("Kernel size: %dKb\n", binfo.krnl_size);
 	goto_xy(10,12);
 	printf("Kernel loc: 0x%x\n", binfo.krnl_loc);
+	goto_xy(10,13);
+	printf("Allocated: %d\n", alloc0);
+	goto_xy(10,14);
+	printf("Allocated: %d\n", alloc1);
+	goto_xy(10,15);
+	printf("Allocated: %d\n", alloc2);
 
 	for (;;);
 	return 0;

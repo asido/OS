@@ -51,20 +51,6 @@ void goto_xy(unsigned x, unsigned y)
 	_cursor_loc = MAX_CRS_X * y + x;
 }
 
-/* TODO: move those out to HAL or something */
-/* Reads the data from IN port */
-unsigned char inportb(unsigned short _port)
-{
-    unsigned char rv;
-    __asm__ __volatile__ ("inb %1, %0" : "=a" (rv) : "dN" (_port));
-    return rv;
-}
-/* Writes the date to OUT port */
-void outportb (unsigned short _port, unsigned char _data)
-{
-    __asm__ __volatile__ ("outb %1, %0" : : "dN" (_port), "a" (_data));
-}
-
 /*
  * Sets memory location at `dest` to `val` for `count` bytes.
  * Returns `dest`

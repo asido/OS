@@ -49,7 +49,4 @@ void goto_xy(unsigned x, unsigned y);
 void set_color(unsigned char backgrnd, unsigned char forgrnd);
 void clear_screen();
 
-unsigned char inportb (unsigned short _port);
-void outportb (unsigned short _port, unsigned char _data);
-
 #endif /* end of include guard: __LIBC_H_ */

@@ -41,6 +41,12 @@ typedef unsigned size_t;
 #define MIN(a, b)		((a) > (b) ? (b) : (a))
 #define ABS(a)			(((a) < 0) ? -(a) : (a))
 #define SWAP(a, b)		do { (a) ^= (b); (b) ^= (a); (a) ^= (b); } while (0)
+#define BYTE_TO_KB(b)	((b) / 1024)
+#define KB_TO_MB(kb)	((b) / 1024)
+#define BYTE_TO_MB(b)	(KB_TO_MB(BYTE_TO_KB((b))))
+#define MB_TO_KB(mb)	((mb) * 1024)
+#define KB_TO_BYTE(kb)	((kb) * 1024)
+#define MB_TO_BYTE(mb)	(MB_TO_KB(KB_TO_BYTE((mb))))
 
 
 /* integral sizes */

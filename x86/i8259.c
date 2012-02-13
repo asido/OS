@@ -5,7 +5,7 @@
  *****************************************************************************/
 /* TODO: probably will need some PIC masking or something */
 
-#include <libc.h>
+#include "cpu.h"
 #include "i8259.h"
 #include "idt.h"
 

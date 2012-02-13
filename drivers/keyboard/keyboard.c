@@ -10,6 +10,7 @@
  */
 
 #include <libc.h>
+#include <x86/cpu.h>
 #include <x86/i8259.h>
 
 /* Table reference: http://www.brokenthorn.com/Resources/OSDevScanCodes.html */
