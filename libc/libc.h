@@ -46,6 +46,8 @@ char *itoa(int value, char *str, int base);
 
 /* custom functions */
 void goto_xy(unsigned x, unsigned y);
+void cursor_save();
+void cursor_load();
 void set_color(unsigned char backgrnd, unsigned char forgrnd);
 void clear_screen();
 

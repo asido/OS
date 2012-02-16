@@ -10,6 +10,9 @@
 static int _cursor_loc = 0;
 static char _color = 0;
 
+static int _cursor_save = 0;
+static char _color_save = 0;
+
 static int cursor_move(int cnt);
 static int cursor_move_line(int cnt);
 static int _puts(const char *text);
@@ -49,6 +52,18 @@ void set_color(unsigned char backgrnd, unsigned char forgrnd)
 void goto_xy(unsigned x, unsigned y)
 {
 	_cursor_loc = MAX_CRS_X * y + x;
+}
+
+void cursor_save()
+{
+	_cursor_save = _cursor_loc;
+	_color_save = _color;
+}
+
+void cursor_load()
+{
+	_cursor_loc = _cursor_save;
+	_color = _color_save;
 }
 
 /*

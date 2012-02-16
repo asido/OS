@@ -18,9 +18,11 @@ unsigned long long pit_jiffy = 0;
  */
 void x86_i8253_irq_do_handle()
 {
+	cursor_save();
 	goto_xy(0, 0);
 	pit_jiffy++;
 	printf("%d", pit_jiffy);
+	cursor_load();
 
 	irq_done(IRQ0_VECTOR);
 }
