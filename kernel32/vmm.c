@@ -122,11 +122,14 @@ inline static addr_t va_to_pde_mem(addr_t va, addr_t pde)
  */
 static int vmm_map_table(addr_t table_addr, addr_t va)
 {
+	addr_t entry;
 	int pde_idx;
 
 	pde_idx = VA_TO_PDE_IDX(va);
-	int addr = table_addr | (PTE_FLAG_PRESENT | PTE_FLAG_RW);
-	_cur_pde->ptes[pde_idx] = addr;
+	entry_add_frame(&entry, table_addr);
+	entry_add_flag(&entry, PTE_FLAG_PRESENT);
+	entry_add_flag(&entry, PTE_FLAG_RW);
+	_cur_pde->ptes[pde_idx] = entry;
 
 	return 0;
 }
