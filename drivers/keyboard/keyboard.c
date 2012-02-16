@@ -13,6 +13,9 @@
 #include <x86/cpu.h>
 #include <x86/i8259.h>
 
+static int kbrd_enable();
+static int kbrd_disable();
+
 /* Table reference: http://www.brokenthorn.com/Resources/OSDevScanCodes.html */
 
 /*
@@ -434,7 +437,7 @@ static const short SCAN_CODES_SYMBOLS[] = {
 		((char)(reg) & 0x1)
 #define STATUS_WRITE_BUF_FULL(reg)	\
 		((char)(reg) & 0x2)
-#define STATUS_SELF_TEST_SUCCESS(reg)	\
+#define STATUS_SELF_TEST_DONE(reg)	\
 		((char)(reg) & 0x4)
 #define STATUS_LAST_WRITE_DATA(reg)	\
 		((char)(~(reg)) & 0x8) /* from KBRD_PORT_ENCODER */
@@ -574,7 +577,7 @@ static void handle_break_code(short code)
 		return;
 	}
 }
-
+static int b = 0;
 /*
  * Keyboard interrupt handler
  */
@@ -611,6 +614,7 @@ repeat:
 	else if (ENCOD_IS_BREAK_CODE(buf))
 		handle_break_code(buf);
 
+
 	/* printf("%x", buf); */
 
 exit:
@@ -626,9 +630,11 @@ static int do_self_test()
 	/* request self test */
 	outportb(KBRD_PORT_CTRL, CTRL_CMD_SELF_TEST);
 
-	/* XXX: can we read immediately after requesting ??? */
-	int status = get_kbrd_status();
-	if (STATUS_SELF_TEST_SUCCESS(status))
+	while (!STATUS_SELF_TEST_DONE(get_kbrd_status()))
+		;
+
+	/* return status; */
+	if (get_kbrd_buffer() == 0x55)
 		return 0;
 	return -1;
 }
@@ -662,9 +668,15 @@ void kbrd_sys_reset()
  */
 int kbrd_init()
 {
+	int status;
+
 	_shift_on = false;
 	_caps_on = false;
 	_ctrl_on = false;
 	_multicode = false;
-	return do_self_test();
+
+	status = do_self_test();
+	kbrd_disable();
+	kbrd_enable();
+	return status;
 }
