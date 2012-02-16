@@ -577,7 +577,7 @@ static void handle_break_code(short code)
 		return;
 	}
 }
-static int b = 0;
+
 /*
  * Keyboard interrupt handler
  */
@@ -591,7 +591,6 @@ repeat:
 	/* another choice might be to busy-loop while not ready. TODO: investigate */
 	if (!STATUS_READ_BUF_FULL(status))
 		goto exit;
-
 
 	/* Try to get the scan code */
 	buf = get_kbrd_buffer();
@@ -613,7 +612,6 @@ repeat:
 		handle_make_code(buf);
 	else if (ENCOD_IS_BREAK_CODE(buf))
 		handle_break_code(buf);
-
 
 	/* printf("%x", buf); */
 
