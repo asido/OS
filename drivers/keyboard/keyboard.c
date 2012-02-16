@@ -172,6 +172,7 @@
 #define	KEY_PAGEDOWN           0x400f
 #define	KEY_SCROLLLOCK         0x4010
 #define	KEY_PAUSE              0x4011
+#define KEY_PRINT              0x4012
 
 
 /*
@@ -179,7 +180,7 @@
  * In my tests all emulators returned me Set 1 codes, so let's use it here.
  * (Might be because my host is set like that)
  */
-static const short SCAN_CODES_SINGLE_MAKE[] = {
+static const short SCAN_CODES_SINGLE[] = {
 	[0x1]	= KEY_ESCAPE,
 	[0x2]	= KEY_1,
 	[0x3]	= KEY_2,
@@ -262,7 +263,58 @@ static const short SCAN_CODES_SINGLE_MAKE[] = {
 	[0x50]	= KEY_KP_2,
 	[0x51]	= KEY_KP_3,
 	[0x52]	= KEY_KP_0,
-	[0x53]	= KEY_KP_DECIMAL
+	[0x53]	= KEY_KP_DECIMAL,
+	[0x56]	= KEY_LESS
+};
+
+static const short SCAN_CODES_MULTI[] = {
+	[0x1C]	= KEY_KP_ENTER,
+	[0x1D]	= KEY_RCTRL,
+	[0x35]	= KEY_KP_DIVIDE,
+	[0x37]	= KEY_PRINT,
+	[0x38]	= KEY_RALT,
+	[0x47]	= KEY_HOME,
+	[0x48]	= KEY_UP,
+	[0x49]	= KEY_PAGEUP,
+	[0x4B]	= KEY_LEFT,
+	[0x4D]	= KEY_RIGHT,
+	[0x4F]	= KEY_END,
+	[0x50]	= KEY_DOWN,
+	[0x51]	= KEY_PAGEDOWN,
+	[0x52]	= KEY_INSERT,
+	[0x53]	= KEY_DELETE
+};
+
+static const short SCAN_CODES_BREAK[] = {
+	[0xAA]	= KEY_LSHIFT,
+	[0xB6]	= KEY_RSHIFT,
+	[0xBA]	= KEY_CAPSLOCK,
+	[0xD9]	= KEY_LCTRL
+};
+
+static const short SCAN_CODES_SYMBOLS[] = {
+	[0x2]	= KEY_EXCLAMATION,
+	[0x3]	= KEY_AT,
+	[0x4]	= KEY_HASH,
+	[0x5]	= KEY_DOLLAR,
+	[0x6]	= KEY_PERCENT,
+	[0x7]	= KEY_CARRET,
+	[0x8]	= KEY_AMPERSAND,
+	[0x9]	= KEY_ASTERISK,
+	[0xA]	= KEY_LEFTPARENTHESIS,
+	[0xB]	= KEY_RIGHTPARENTHESIS,
+	[0xC]	= KEY_UNDERSCORE,
+	[0xD]	= KEY_PLUS,
+	[0x1A]	= KEY_LEFTCURL,
+	[0x1B]	= KEY_RIGHTCURL,
+	[0x27]	= KEY_COLON,
+	[0x28]	= KEY_QUOTEDOUBLE,
+	[0x29]	= KEY_TILDE,
+	[0x2B]	= KEY_BAR,
+	[0x33]	= KEY_LESS,
+	[0x34]	= KEY_GREATER,
+	[0x35]	= KEY_QUESTION,
+	[0x56]	= KEY_GREATER
 };
 
 
@@ -398,9 +450,13 @@ static const short SCAN_CODES_SINGLE_MAKE[] = {
 		((char)(reg) & 0x80)
 
 /* error checks */
+#define ENCOD_IS_MAKE_CODE(code)	\
+	 (((code) >= 0x1) && ((code) <= 0x58))
+#define ENCOD_IS_BREAK_CODE(code)	\
+	 (((code) >= 0x81) && ((code) <= 0xDB))
 #define ENCOD_IS_SCAN_CODE(rslt)	\
-		((((rslt) >= 0x1) && ((rslt) <= 0x58)) ||	\
-		 (((rslt) >= 0x81) && ((rslt) <= 0xD8)))
+		(ENCOD_IS_MAKE_CODE(rslt) ||	\
+		 ENCOD_IS_BREAK_CODE(rslt))
 #define ENCOD_BUF_OVERRUN(rslt) ((rslt) == 0)
 #define ENCOD_DIAGNOSTIC_FAIL(rslt) ((rslt) == 0xFD)
 #define ENCOD_BAT_FAIL(rslt) ((rslt) == 0xFC) /* BAT - Basic Assurance Test */
@@ -412,9 +468,28 @@ static const short SCAN_CODES_SINGLE_MAKE[] = {
 		  ENCOD_BAT_FAIL(rslt) || ENCOD_RESEND_REQ(rslt) ||	\
 		  ENCOD_KEY_ERROR(rslt)))
 
+#define IS_SHIFT_MAKE(code)	\
+	 ((SCAN_CODES_SINGLE[(code)] == (KEY_LSHIFT)) ||	\
+	  (SCAN_CODES_SINGLE[(code)] == (KEY_RSHIFT)))
+#define IS_SHIFT_BREAK(code)	\
+	 ((SCAN_CODES_BREAK[(code)] == (KEY_LSHIFT)) ||	\
+	  (SCAN_CODES_BREAK[(code)] == (KEY_RSHIFT)))
+#define IS_CTRL_MAKE(code)	\
+	 ((SCAN_CODES_SINGLE[(code)] == (KEY_LCTRL)) ||	\
+	  (SCAN_CODES_SINGLE[(code)] == (KEY_RCTRL)))
+#define IS_CTRL_BREAK(code)	\
+	 ((SCAN_CODES_BREAK[(code)] == KEY_LCTRL) ||	\
+	  (SCAN_CODES_BREAK[(code)] == KEY_RCTRL))
+#define IS_CAPS_MAKE(code)	\
+	 (SCAN_CODES_SINGLE[(code)] == (KEY_CAPSLOCK))
+
+#define IS_MULTICODE(code)	\
+	 ((code) == 0xE0 || (code) == 0xE1)
+
 static bool _shift_on;
 static bool _caps_on;
 static bool _ctrl_on;
+static bool _multicode;
 
 static char get_kbrd_buffer()
 {
@@ -424,6 +499,80 @@ static char get_kbrd_buffer()
 static char get_kbrd_status()
 {
 	return inportb(KBRD_PORT_CTRL);
+}
+
+static char shift_effect(char c, short code)
+{
+	if (ISDIGIT(c) || ISSYMBOL(c))
+		return SCAN_CODES_SYMBOLS[code];
+	else if (ISALPHA(c) && ISLOWER(c))
+		return TOUPPER(c);
+
+	return c;
+}
+
+static char caps_effect(char c, short code)
+{
+	if (ISALPHA(c) && ISLOWER(c))
+		return TOUPPER(c);
+
+	return c;
+}
+
+static void handle_make_code(short code)
+{
+	char c;
+
+	if (IS_SHIFT_MAKE(code))
+	{
+		_shift_on = true;
+		return;
+	}
+	else if (IS_CTRL_MAKE(code))
+	{
+		_ctrl_on = true;
+		return;
+	}
+	else if (IS_CAPS_MAKE(code))
+	{
+		_caps_on = !_caps_on;
+		return;
+	}
+
+	if (_multicode)
+	{
+		c = SCAN_CODES_MULTI[code];
+		_multicode = false;
+	}
+	else
+		c = SCAN_CODES_SINGLE[code];
+
+	if (!ISPRINTABLE(c))
+		return;
+
+	if (_shift_on)
+		c = shift_effect(c, code);
+	if (_caps_on)
+		c = caps_effect(c, code);
+
+	putchar(c);
+}
+
+static void handle_break_code(short code)
+{
+	if (_multicode)
+		_multicode = false;
+
+	if (IS_SHIFT_BREAK(code))
+	{
+		_shift_on = false;
+		return;
+	}
+	else if (IS_CTRL_BREAK(code))
+	{
+		_ctrl_on = false;
+		return;
+	}
 }
 
 /*
@@ -440,16 +589,29 @@ repeat:
 	if (!STATUS_READ_BUF_FULL(status))
 		goto exit;
 
+
 	/* Try to get the scan code */
 	buf = get_kbrd_buffer();
+
 	if (!ENCOD_IS_SCAN_CODE(buf))
 	{
 		if (ENCOD_RESEND_REQ(buf))
 			goto repeat;
+		else if (IS_MULTICODE(buf))
+		{
+			_multicode = true;
+			goto exit;
+		}
 		else
 			goto exit;
 	}
-	putchar(SCAN_CODES_SINGLE_MAKE[buf]);
+
+	if (ENCOD_IS_MAKE_CODE(buf))
+		handle_make_code(buf);
+	else if (ENCOD_IS_BREAK_CODE(buf))
+		handle_break_code(buf);
+
+	/* printf("%x", buf); */
 
 exit:
 	irq_done(IRQ1_VECTOR);
@@ -503,5 +665,6 @@ int kbrd_init()
 	_shift_on = false;
 	_caps_on = false;
 	_ctrl_on = false;
+	_multicode = false;
 	return do_self_test();
 }
