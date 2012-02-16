@@ -28,16 +28,7 @@
 	((block_idx) * BITMAP_BIT_CNT)
 
 #define BLOCK_TO_MEM(idx)	\
-	((idx) * BLOCK_SIZE)
-
-#define UNSET_BIT(val, bit)	\
-	((val) & (~(1 << (bit))))
-#define SET_BIT(val, bit)	\
-	((val) | (1 << (bit)))
-#define GET_BIT(val, bit)	\
-	(((val) & (1 << (bit))) >> (bit))
-#define IS_BIT_FREE(val, bit)	\
-	(GET_BIT(val, bit) == 0)
+	((void *)((idx) * BLOCK_SIZE))
 
 enum ALIGN {
 	ALIGN_LOW,
@@ -50,20 +41,21 @@ struct pmm_t {
 };
 
 static struct pmm_t pmm;
-static unsigned char mem_bitmap[UINT_MAX / BLOCK_SIZE / sizeof(char) / BITMAP_BIT_CNT];
+static unsigned char *mem_bitmap;
 
 /*
  * Initializes PMM.
- * Returns 0 on success.
+ * Returns the end of mem_bitmap array
  */
-int pmm_init(unsigned int mem_kb)
+addr_t pmm_init(unsigned int mem_kb, addr_t bitmap_loc)
 {
 	/* on init set all memory as reservered */
-	memset(mem_bitmap, 0xFF, sizeof(mem_bitmap));
-	pmm.block_cnt = mem_kb * 1024 / BLOCK_SIZE;
+	mem_bitmap = (unsigned char *) bitmap_loc;
+	memset(mem_bitmap, 0xFF, SIZE_KB_TO_BLOCKS(mem_kb) / BITMAP_BIT_CNT);
+	pmm.block_cnt = SIZE_KB_TO_BLOCKS(mem_kb);
 	pmm.blocks_free = 0;
 
-	return 0;
+	return ((addr_t) mem_bitmap) + (pmm.block_cnt / BITMAP_BIT_CNT) + INT_BIT;
 }
 
 static void set_bit(size_t idx)
@@ -96,7 +88,7 @@ static unsigned int get_free_bit(char val)
 	int i;
 
 	for (i = 0; i < BITMAP_BIT_CNT; i++)
-		if (IS_BIT_FREE(val, i))
+		if (IS_BIT_SET(val, i))
 			return i;
 	return -1;
 }
@@ -108,9 +100,15 @@ static int is_free_sequence(size_t block_idx, int block_cnt)
 	idx = BLOCK_IDX_TO_BITMAP_IDX(block_idx);
 	offset = BLOCK_IDX_TO_BIT_OFFSET(block_idx);
 
-	for (i = 0; i < block_cnt; i++)
+	for (i = 0; i < block_cnt; i++, offset++)
 	{
-		if (IS_BIT_FREE(mem_bitmap[idx], offset))
+		if (offset > BITMAP_BIT_CNT)
+		{
+			offset = 0;
+			idx++;
+		}
+
+		if (IS_BIT_SET(mem_bitmap[idx], offset))
 			continue;
 		else
 			return 0;
@@ -141,23 +139,23 @@ static unsigned int find_free_blocks(int count)
 
 /*
  * Allocated `size` of blocks starting from `start`
- * Returns negative on error, allocated size on success.
+ * Returns 0 on error.
  */
-unsigned int pmm_alloc(unsigned int bytes)
+void *pmm_alloc(unsigned int bytes)
 {
 	int i, idx, block_count;
 
 	if (!bytes)
-		return 0;
+		return NULL;
 
 	block_count = SIZE_B_TO_BLOCKS(bytes);
 
 	if (!pmm.blocks_free || pmm.blocks_free < block_count)
-		return -1;
+		return NULL;
 
 	idx = find_free_blocks(block_count);
 	if (idx <= 0)
-		return -2;
+		return NULL;
 
 	pmm.blocks_free -= block_count;
 	for (i = 0; i < block_count; i++)
@@ -166,13 +164,17 @@ unsigned int pmm_alloc(unsigned int bytes)
 	return BLOCK_TO_MEM(idx);
 }
 
-int pmm_dealloc(unsigned int addr)
+int pmm_dealloc(unsigned int addr, size_t size)
 {
+	size_t i;
 	size_t idx = MEM_TO_BLOCK_IDX(addr);
-	if (idx > pmm.block_cnt)
-		return -1;
-	unset_bit(idx);
-	pmm.blocks_free++;
+
+	size = SIZE_B_TO_BLOCKS(size);
+	for (i = 0; i < size && idx <= pmm.block_cnt; i++, idx++)
+	{
+		unset_bit(idx);
+		pmm.blocks_free++;
+	}
 	return 0;
 }
 
@@ -192,7 +194,7 @@ int pmm_init_region(unsigned int addr, size_t size)
 	for (i = 0;
          (i < block_cnt) || (block_idx + i < pmm.block_cnt);
          i++, addr += BLOCK_SIZE)
-		pmm_dealloc(addr);
+		pmm_dealloc(addr, 1);
 	return i;
 }
 

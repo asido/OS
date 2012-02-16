@@ -47,10 +47,20 @@ typedef unsigned size_t;
 #define MB_TO_KB(mb)	((mb) * 1024)
 #define KB_TO_BYTE(kb)	((kb) * 1024)
 #define MB_TO_BYTE(mb)	(MB_TO_KB(KB_TO_BYTE((mb))))
+#define ARRAY_LENGTH(arr) (sizeof((arr)) / sizeof((arr[0])))
 
+#define UNSET_BIT(val, bit)	\
+	((val) & (~(1 << (bit))))
+#define SET_BIT(val, bit)	\
+	((val) | (1 << (bit)))
+#define GET_BIT(val, bit)	\
+	(((val) & (1 << (bit))) >> (bit))
+#define IS_BIT_SET(val, bit)	\
+	(GET_BIT(val, bit) == 0)
 
 /* integral sizes */
 #define	CHAR_BIT	8
+#define CHAR_BYTE	1
 /* signed char */
 #define	SCHAR_MIN	(-128)
 #define	SCHAR_MAX	127	
@@ -60,11 +70,15 @@ typedef unsigned size_t;
 #define	CHAR_MIN	SCHAR_MIN
 #define	CHAR_MAX	SCHAR_MAX
 /* short */
+#define SHORT_BIT	16
+#define SHORT_BYTE	2
 #define	SHRT_MIN	(-32768)
 #define	SHRT_MAX	32767
 /* unsigned short */
 #define	USHRT_MAX	65535
 /* int */
+#define INT_BIT		32
+#define INT_BYTE	4
 #define	INT_MIN		(-2147483647-1)
 #define	INT_MAX		2147483647
 /* unsigned int */

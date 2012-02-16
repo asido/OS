@@ -32,7 +32,7 @@ ENABLE_PAGING:
 	; initialize the first page table
 	mov edi, PTE_0_ADDR
 	mov ecx, PTE_COUNT
-	shr ecx, 2
+	shr ecx, 2		; just 1st MB since kernel space is 1-5MB
 	xor eax, eax	; the physical address
 	or eax, PTE_FLAG
 .PTE_0_LOOP:

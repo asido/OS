@@ -7,11 +7,12 @@
 #include <libc.h>
 #include <x86/cpu.h>
 #include <x86/i8259.h>
+#include "mm.h"
 
-extern int pmm_init(unsigned int mem_kb);
+extern addr_t pmm_init(unsigned int mem_kb, addr_t bitmap_loc);
 extern int pmm_init_region(unsigned int addr, size_t size);
 extern unsigned int pmm_alloc();
-extern int pmm_dealloc(unsigned int addr);
+extern int pmm_dealloc(unsigned int addr, size_t size);
 
 static char* logo =
 "\
@@ -53,15 +54,15 @@ int kmain(struct boot_info binfo)
 	screen_init();
 	x86_init();
 
-	pmm_init(binfo.mem_size);
-	/* bootloader mappings:  0-1MB - BIOS , 1-5MB - Kernel */
-	int mem_avail_begin = MB_TO_BYTE(5);
+	/* init PMM */
+	addr_t pmm_tbl_loc = binfo.krnl_loc + KB_TO_BYTE(binfo.krnl_size);
+	addr_t pmm_end = pmm_init(binfo.mem_size, pmm_tbl_loc);
+	int mem_avail_begin = MB_TO_BYTE(5); /* first 5MB reserved in boot loader */
 	int mem_avail_end = KB_TO_BYTE(binfo.mem_size);
 	pmm_init_region(mem_avail_begin, mem_avail_end - mem_avail_begin);
-	unsigned int alloc0 = pmm_alloc(15000);
-	unsigned int alloc1 = pmm_alloc(4096);
-	alloc1 = pmm_alloc(4097);
-	unsigned int alloc2 = pmm_alloc(0);
+
+	/* init VMM */
+	vmm_init(pmm_end);
 
 	/* int c = 5 / 0; */
 
@@ -71,12 +72,6 @@ int kmain(struct boot_info binfo)
 	printf("Kernel size: %dKb\n", binfo.krnl_size);
 	goto_xy(10,12);
 	printf("Kernel loc: 0x%x\n", binfo.krnl_loc);
-	goto_xy(10,13);
-	printf("Allocated: %d\n", alloc0);
-	goto_xy(10,14);
-	printf("Allocated: %d\n", alloc1);
-	goto_xy(10,15);
-	printf("Allocated: %d\n", alloc2);
 
 	for (;;);
 	return 0;
