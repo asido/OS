@@ -7,6 +7,7 @@
 #ifndef TIME_Q0HBOH0O
 #define TIME_Q0HBOH0O
 
+#include <libc.h>
 #include <x86/cmos.h>
 
 struct time_t {
@@ -22,15 +23,7 @@ struct time_t {
 #define RTC_TO_HOUR(t)	\
 	((t) >> 16)
 
-inline struct time_t *get_time(struct time_t *t)
-{
-	int time = rtc_get_time();
-
-	t->hour = RTC_TO_HOUR(time);
-	t->min = RTC_TO_MIN(time);
-	t->sec = RTC_TO_SEC(time);
-
-	return t;
-}
+inline struct time_t *get_time(struct time_t *t);
+inline void update_clock();
 
 #endif /* end of include guard: TIME_Q0HBOH0O */

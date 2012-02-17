@@ -83,10 +83,6 @@ int kmain(struct boot_info binfo)
 
 	for (;;)
 	{
-		struct time_t t;
-		get_time(&t);
-		goto_xy(70, 0);
-		printf("%d:%d:%d", t.hour, t.min, t.sec);
 	}
 
 	return 0;
