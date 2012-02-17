@@ -143,7 +143,7 @@ static unsigned int find_free_blocks(int count)
  */
 void *pmm_alloc(unsigned int bytes)
 {
-	int i, idx, block_count;
+	unsigned int i, idx, block_count;
 
 	if (!bytes)
 		return NULL;

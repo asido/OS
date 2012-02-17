@@ -7,12 +7,16 @@
 #include <libc.h>
 #include <x86/cpu.h>
 #include <x86/i8259.h>
+#include <x86/cmos.h>
 #include "mm.h"
+#include "time.h"
 
 extern addr_t pmm_init(unsigned int mem_kb, addr_t bitmap_loc);
 extern int pmm_init_region(unsigned int addr, size_t size);
 extern unsigned int pmm_alloc();
 extern int pmm_dealloc(unsigned int addr, size_t size);
+extern int vmm_init(addr_t krnl_pte_va);
+extern inline void kernel_panic(char *msg);
 
 static char* logo =
 "\
@@ -51,8 +55,10 @@ int kmain(struct boot_info binfo)
 						 "movl %%eax, %%esp \n"
 						: : : "eax");
 
-	screen_init();
-	x86_init();
+	if (screen_init())
+		kernel_panic("screen init error");
+	if (x86_init())
+		kernel_panic("x86 init error");
 
 	/* init PMM */
 	addr_t pmm_tbl_loc = binfo.krnl_loc + KB_TO_BYTE(binfo.krnl_size);
@@ -62,9 +68,11 @@ int kmain(struct boot_info binfo)
 	pmm_init_region(mem_avail_begin, mem_avail_end - mem_avail_begin);
 
 	/* init VMM */
-	vmm_init(pmm_end);
+	if (vmm_init(pmm_end))
+		kernel_panic("VMM init error");
 
-	/* int c = 5 / 0; */
+	if (cmos_init())
+		kernel_panic("CMOS init error");
 
 	goto_xy(10,10);
 	printf("Memory size: %dKb\n", binfo.mem_size);
@@ -73,6 +81,13 @@ int kmain(struct boot_info binfo)
 	goto_xy(10,12);
 	printf("Kernel loc: 0x%x\n", binfo.krnl_loc);
 
-	for (;;);
+	for (;;)
+	{
+		struct time_t t;
+		get_time(&t);
+		goto_xy(70, 0);
+		printf("%d:%d:%d", t.hour, t.min, t.sec);
+	}
+
 	return 0;
 }

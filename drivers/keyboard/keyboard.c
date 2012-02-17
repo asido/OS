@@ -514,7 +514,7 @@ static char shift_effect(char c, short code)
 	return c;
 }
 
-static char caps_effect(char c, short code)
+static char caps_effect(char c)
 {
 	if (ISALPHA(c) && ISLOWER(c))
 		return TOUPPER(c);
@@ -556,7 +556,7 @@ static void handle_make_code(short code)
 	if (_shift_on)
 		c = shift_effect(c, code);
 	if (_caps_on)
-		c = caps_effect(c, code);
+		c = caps_effect(c);
 
 	putchar(c);
 }

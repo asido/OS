@@ -28,8 +28,8 @@ typedef unsigned size_t;
 
 /* Basic macros */
 #define ISPRINTABLE(c) 	(((c) >= 0x20 && (c) <= 0x7F) ||	\
-						ISSPACE(c) || c == 0x8 /* backspace */ ||	\
-						c == 0xD /* CR */ )
+						ISSPACE((c)) || (c) == 0x8 /* backspace */ ||	\
+						(c) == 0xD /* CR */ )
 #define ISSYMBOL(c) 	(((c) >= 0x21 && (c) <= 0x2F) ||	\
 						((c) >= 0x3A && (c) <= 0x40) ||	\
 						((c) >= 0x5B && (c) <= 0x60) ||	\

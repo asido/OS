@@ -7,6 +7,7 @@
 #include <libc.h>
 #include "mm.h"
 
+extern void *pmm_alloc(unsigned int bytes);
 inline void kernel_panic(char *msg);
 
 #define CR0_ENABLE_PAGING 0x80000000
@@ -86,13 +87,14 @@ static int _pde_count;
 	} while (0);
 
 
-static addr_t *alloc_page(addr_t va)
+static addr_t *alloc_page(/* addr_t va */)
 {
-	addr_t addr = pmm_alloc(PAGE_SIZE);
+	addr_t *addr = (addr_t *) pmm_alloc(PAGE_SIZE);
 	if (!addr)
 		kernel_panic("Out of memory");
 
 	/* TODO */
+	return addr;
 }
 
 static void vmm_load_pde(struct pde_t *pde)
@@ -114,7 +116,7 @@ inline static addr_t va_to_pde_mem(addr_t va, addr_t pde)
 	pde_idx = VA_TO_PDE_IDX(va);
 	pte_idx = VA_TO_PTE_IDX(va);
 	
-	return &((struct pde_t *)pde)->ptes[pde_idx] + pte_idx;
+	return (addr_t) &((struct pde_t *)pde)->ptes[pde_idx] + pte_idx;
 }
 
 /*
@@ -139,7 +141,7 @@ static int vmm_map_table(addr_t table_addr, addr_t va)
  */
 int vmm_init(addr_t krnl_pte_va)
 {
-	unsigned int i, offset;
+	unsigned int offset;
 	addr_t addr;
 
 	KRNL_PTE_VA = PAGE_ALIGN(krnl_pte_va);
@@ -156,7 +158,7 @@ int vmm_init(addr_t krnl_pte_va)
 	/* offset since we keep last quarter of kernel tables just above loaded kernel */
 	offset = DIR_ENTRIES * ENTRY_SIZE * 0.75;
 	addr = va_to_pde_mem(KRNL_VA_BEGIN, KRNL_PTE_VA - offset);
-	memcpy(addr, 0x9E000, TABLE_ENTRIES * INT_BYTE);
+	memcpy((void *) addr, (void *) 0x9E000, TABLE_ENTRIES * INT_BYTE);
 	vmm_map_table(KRNL_PTE_PA + offset, KRNL_VA_BEGIN);
 	vmm_load_pde(_cur_pde);
 
