@@ -1,36 +1,36 @@
 /******************************************************************************
- *		x86 CPU related stuff.
+ *      x86 CPU related stuff.
  *
- *			Author: Arvydas Sidorenko
+ *          Author: Arvydas Sidorenko
  ******************************************************************************/
 
 #ifndef CPU_N1YAILHP
 #define CPU_N1YAILHP
 
 struct x86_reg_t {
-	int eax;
-	int ebx;
-	int ecx;
-	int edx;
-	int esi;
-	int edi;
-	int ebp;
-	int esp;
-	int eip;
-	struct x86_seg_reg_t *seg_reg;
+    int eax;
+    int ebx;
+    int ecx;
+    int edx;
+    int esi;
+    int edi;
+    int ebp;
+    int esp;
+    int eip;
+    struct x86_seg_reg_t *seg_reg;
 };
 
 struct x86_seg_reg_t {
-	short cs;
-	short ds;
-	short ss;
-	short es;
-	short fs;
-	short gs;
+    short cs;
+    short ds;
+    short ss;
+    short es;
+    short fs;
+    short gs;
 };
 
 /* IRQ exception lines */
-#define X86_DIVIDE_IRQ	0
+#define X86_DIVIDE_IRQ  0
 #define X86_SINGLE_STEP_DEBUG_IRQ 1
 #define X86_NONMASK_IRQ 2
 #define X86_BREAKPOINT_IRQ 3

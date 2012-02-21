@@ -1,7 +1,7 @@
 /******************************************************************************
- *		x86 CPU exception handlers.
+ *      x86 CPU exception handlers.
  *
- *			Author: Arvydas Sidorenko
+ *          Author: Arvydas Sidorenko
  ******************************************************************************/
 
 #include "cpu.h"
@@ -15,7 +15,7 @@ extern void kernel_panic(char *msg);
  */
 void x86_divide_except()
 {
-	kernel_panic("attempt to divide by zero");
+    kernel_panic("attempt to divide by zero");
 }
 
 /*
@@ -24,7 +24,7 @@ void x86_divide_except()
  */
 void x86_single_step_debug_except()
 {
-	kernel_panic("single step debug trap");
+    kernel_panic("single step debug trap");
 }
 
 /*
@@ -33,7 +33,7 @@ void x86_single_step_debug_except()
  */
 void x86_nonmask_except()
 {
-	kernel_panic("nonmaskable hardware interrupt");
+    kernel_panic("nonmaskable hardware interrupt");
 }
 
 /*
@@ -42,7 +42,7 @@ void x86_nonmask_except()
  */
 void x86_breakpoint_except()
 {
-	kernel_panic("breakpoint INT 3 instruction");
+    kernel_panic("breakpoint INT 3 instruction");
 }
 
 /*
@@ -51,7 +51,7 @@ void x86_breakpoint_except()
  */
 void x86_overflow_except()
 {
-	kernel_panic("overflow fault");
+    kernel_panic("overflow fault");
 }
 
 /*
@@ -60,7 +60,7 @@ void x86_overflow_except()
  */
 void x86_bound_except()
 {
-	kernel_panic("BOUND instruction fault");
+    kernel_panic("BOUND instruction fault");
 }
 
 /*
@@ -69,19 +69,19 @@ void x86_bound_except()
  */
 void x86_invalid_opcode_except()
 {
-	kernel_panic("invalid opcode");
+    kernel_panic("invalid opcode");
 }
 
 /*
  * Occurs during one of the two conditions:
- * 		- CPU reaches ESC instruction while EM (emulate) bit of CR0 is set.
- * 		- CPU reaches WAIT or ESC instruction and both MP (monitor coprocessor)
- * 		and TS (task switched) bits of CR0 are set.
+ *      - CPU reaches ESC instruction while EM (emulate) bit of CR0 is set.
+ *      - CPU reaches WAIT or ESC instruction and both MP (monitor coprocessor)
+ *      and TS (task switched) bits of CR0 are set.
  * IRQ: 7
  */
 void x86_busy_coproc_except()
 {
-	kernel_panic("busy co-CPU fault");
+    kernel_panic("busy co-CPU fault");
 }
 
 /*
@@ -91,7 +91,7 @@ void x86_busy_coproc_except()
  */
 void x86_double_fault_except()
 {
-	kernel_panic("double fault");
+    kernel_panic("double fault");
 }
 
 /*
@@ -102,7 +102,7 @@ void x86_double_fault_except()
  */
 void x86_coproc_overrun_except()
 {
-	kernel_panic("co-CPU overrun fault");
+    kernel_panic("co-CPU overrun fault");
 }
 
 /*
@@ -111,7 +111,7 @@ void x86_coproc_overrun_except()
  */
 void x86_invalid_tss_except()
 {
-	kernel_panic("invalid TSS");
+    kernel_panic("invalid TSS");
 }
 
 /*
@@ -120,20 +120,20 @@ void x86_invalid_tss_except()
  */
 void x86_no_segment_except()
 {
-	kernel_panic("no segment fault");
+    kernel_panic("no segment fault");
 }
 
 /*
  * Occurs during one of two conditions:
- * 		- Limit violation in any operation that refers to
- * 		SS (stack segment register).
- * 		- When attempting to load SS with a descriptor which is marked
- * 		as not-present but is otherwise valid.
+ *      - Limit violation in any operation that refers to
+ *      SS (stack segment register).
+ *      - When attempting to load SS with a descriptor which is marked
+ *      as not-present but is otherwise valid.
  * IRQ: 12
  */
 void x86_stack_except()
 {
-	kernel_panic("stack fault");
+    kernel_panic("stack fault");
 }
 
 /*
@@ -142,7 +142,7 @@ void x86_stack_except()
  */
 void x86_gpf_except()
 {
-	kernel_panic("GPF");
+    kernel_panic("GPF");
 }
 
 /*
@@ -151,7 +151,7 @@ void x86_gpf_except()
  */
 void x86_page_fault_except()
 {
-	kernel_panic("page fault");
+    kernel_panic("page fault");
 }
 
 /* IRQ 15 is reserved */
@@ -162,7 +162,7 @@ void x86_page_fault_except()
  */
 void x86_coproc_except()
 {
-	kernel_panic("internal co-CPU fault");
+    kernel_panic("internal co-CPU fault");
 }
 
 /* IRQ 17-31 are reserved */

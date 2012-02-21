@@ -1,7 +1,7 @@
 /******************************************************************************
- *		Intel 8253 PIT controller - Programmable Interval Timer
+ *      Intel 8253 PIT controller - Programmable Interval Timer
  *
- *			Author: Arvydas Sidorenko
+ *          Author: Arvydas Sidorenko
  ******************************************************************************/
 
 #ifndef I8253_IA5WC1E3
@@ -10,7 +10,7 @@
 /* PIT interrupt Hz */
 #define PIT_HZ 1000
 #define PIT_CLOCK_TICK 1193181
-#define PIT_FREQ	(PIT_CLOCK_TICK / PIT_HZ)
+#define PIT_FREQ    (PIT_CLOCK_TICK / PIT_HZ)
 
 /* Ports */
 #define PIT_PORT_BASE 0x40
@@ -24,10 +24,10 @@
 #define PIT_CTRL_BCD_DEC 0x1
 /* 2-4th bit - Mode */
 #define PIT_CTRL_MODE_ON_TERM_CNT 0
-#define PIT_CTRL_MODE_ONE_SHOT 0x2	/* 00000010 */
-#define PIT_CTRL_MODE_RATE_GEN 0x4	/* 00000100 */
-#define PIT_CTRL_MODE_SQR_WAVE 0x6	/* 00000110 */
-#define PIT_CTRL_MODE_SOFT_TRIG 0x8	/* 00001000 */
+#define PIT_CTRL_MODE_ONE_SHOT 0x2  /* 00000010 */
+#define PIT_CTRL_MODE_RATE_GEN 0x4  /* 00000100 */
+#define PIT_CTRL_MODE_SQR_WAVE 0x6  /* 00000110 */
+#define PIT_CTRL_MODE_SOFT_TRIG 0x8 /* 00001000 */
 #define PIT_CTRL_MODE_HARD_TRIG 0xA /* 00001010 */
 /* 5-6th bit - RL (Read/Load) */
 #define PIT_CTRL_RL_MOST_SIG       0x20 /* 00100000 */

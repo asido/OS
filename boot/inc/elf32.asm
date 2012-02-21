@@ -1,52 +1,52 @@
 ;==============================================================================
-;	ELF executable related routines
-;		
-;		Author: Arvydas Sidorenko
+;   ELF executable related routines
+;       
+;       Author: Arvydas Sidorenko
 ;==============================================================================
 
-ELFSignature:	 db 0x7F,'ELF'	; ELF signature
+ELFSignature:    db 0x7F,'ELF'  ; ELF signature
 
 ;------------------------------------------------
-;	Validates ELF
-;		ARG0 => pointer to ELF's base in memory
-;		Returns 0 if all good, -1 if error found.
+;   Validates ELF
+;       ARG0 => pointer to ELF's base in memory
+;       Returns 0 if all good, -1 if error found.
 ;------------------------------------------------
 VALIDATE_ELF:
-	push ebp
-	mov ebp, esp
-	push esi
-	push edi
-	xor eax, eax
+    push ebp
+    mov ebp, esp
+    push esi
+    push edi
+    xor eax, eax
 
-	; kernel image signature
-	mov esi, DWORD [ebp+0x8]
-	mov edi, ELFSignature
-	cmpsd
-	jne .Error
-	; check data encoding
-	add esi, 5
-	cmp esi, 0
-	jne .Success
+    ; kernel image signature
+    mov esi, DWORD [ebp+0x8]
+    mov edi, ELFSignature
+    cmpsd
+    jne .Error
+    ; check data encoding
+    add esi, 5
+    cmp esi, 0
+    jne .Success
 .Error:
-	mov eax, -1
+    mov eax, -1
 .Success:
-	pop edi
-	pop esi
-	leave
-	ret 4
+    pop edi
+    pop esi
+    leave
+    ret 4
 
 
 ;------------------------------------------------
-;	Returns executable entry point
-;		ARG0 => pointer to ELF's base in memory.
+;   Returns executable entry point
+;       ARG0 => pointer to ELF's base in memory.
 ;------------------------------------------------
 GET_ELF_ENTRY:
-	push ebp
-	mov ebp, esp
+    push ebp
+    mov ebp, esp
 
-	mov eax, DWORD [ebp+0x8]
-	add eax, 0x18
-	mov eax, [eax]
+    mov eax, DWORD [ebp+0x8]
+    add eax, 0x18
+    mov eax, [eax]
 
-	leave
-	ret 4
+    leave
+    ret 4

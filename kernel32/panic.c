@@ -1,7 +1,7 @@
 /******************************************************************************
- *		Kernel panic routines.
+ *      Kernel panic routines.
  *
- *			Author: Arvydas Sidorenko
+ *          Author: Arvydas Sidorenko
  ******************************************************************************/
 
 #include <libc.h>
@@ -13,15 +13,15 @@
  */
 inline void kernel_panic(char *msg)
 {
-	clear_screen();
-	goto_xy(0, 0);
+    clear_screen();
+    goto_xy(0, 0);
 
-	puts("**** FATAL KERNEL PANIC ****");
-	if (msg)
-		printf("\nReason: %s\n", msg);
-	puts("");
+    puts("**** FATAL KERNEL PANIC ****");
+    if (msg)
+        printf("\nReason: %s\n", msg);
+    puts("");
 
-	x86_dump_registers();
-	puts("\nCPU IS HALTED\n");
-	x86_cpu_halt();
+    x86_dump_registers();
+    puts("\nCPU IS HALTED\n");
+    x86_cpu_halt();
 }

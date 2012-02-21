@@ -13,7 +13,7 @@ OBJ		:= $(SOURCE:.c=.o)
 all: $(OBJ)
 
 # Explanation:
-# 	$@	<= means the rule
-# 	$<	<= means dependency
+#	$@	<= means the rule
+#	$<	<= means dependency
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@ $(CLIB)

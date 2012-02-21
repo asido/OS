@@ -1,7 +1,7 @@
 /******************************************************************************
- *		CMOS driver
+ *      CMOS driver
  *
- *			Author: Arvydas Sidorenko
+ *          Author: Arvydas Sidorenko
  ******************************************************************************/
 
 #include <libc.h>
@@ -13,10 +13,10 @@
 
 #define CMOS_NMI_BIT 0x40
 
-#define NMI_ENABLE(data)	\
-	((data) | (CMOS_NMI_BIT))
-#define NMI_DISABLE(data)	\
-	((data) & (~(CMOS_NMI_BIT)))
+#define NMI_ENABLE(data)    \
+    ((data) | (CMOS_NMI_BIT))
+#define NMI_DISABLE(data)   \
+    ((data) & (~(CMOS_NMI_BIT)))
 
 /* these are in BCD */
 #define RTC_CUR_SEC 0x0
@@ -50,21 +50,21 @@
 #define CMOS_DISKETTE_720k 0x3
 #define CMOS_DISKETTE_1M44 0x4
 /* Checking */
-#define CMOS_DISKETTE_TYPE_DRIVE0(data)	\
-	(((data) >> 4) & 0xF)
-#define CMOS_DISKETTE_TYPE_DRIVE1(data)	\
-	((data) & 0xF)
+#define CMOS_DISKETTE_TYPE_DRIVE0(data) \
+    (((data) >> 4) & 0xF)
+#define CMOS_DISKETTE_TYPE_DRIVE1(data) \
+    ((data) & 0xF)
 
-#define BCD_TO_INT(bcd)	\
-	(((((bcd) & 0xF0) >> 4) * 10) + ((bcd) & 0xF))
+#define BCD_TO_INT(bcd) \
+    (((((bcd) & 0xF0) >> 4) * 10) + ((bcd) & 0xF))
 
 /*
  * CMOS OUT port
  */
 static int cmos_select_ram(int idx)
 {
-	outportb(CMOS_INDEX_PORT, idx);
-	return 0;
+    outportb(CMOS_INDEX_PORT, idx);
+    return 0;
 }
 
 /*
@@ -72,13 +72,13 @@ static int cmos_select_ram(int idx)
  */
 inline static char cmos_read_ram()
 {
-	return inportb(CMOS_DATA_PORT);
+    return inportb(CMOS_DATA_PORT);
 }
 
 inline static int cmos_write_ram(int data)
 {
-	outportb(CMOS_DATA_PORT, data);
-	return 0;
+    outportb(CMOS_DATA_PORT, data);
+    return 0;
 }
 
 /*
@@ -87,12 +87,12 @@ inline static int cmos_write_ram(int data)
  */
 static int rtc_in_update()
 {
-	int ram = NMI_DISABLE(STATUS_REG_A);
+    int ram = NMI_DISABLE(STATUS_REG_A);
 
-	cmos_select_ram(ram);
-	char res = cmos_read_ram();
+    cmos_select_ram(ram);
+    char res = cmos_read_ram();
 
-	return (res & STATUS_REG_A_UPDATE_IN_PROGRESS);
+    return (res & STATUS_REG_A_UPDATE_IN_PROGRESS);
 }
 
 /* 
@@ -101,57 +101,57 @@ static int rtc_in_update()
  */
 static int cmos_diagnostic()
 {
-	char ram;
+    char ram;
 
-	ram = CMOS_DIAGNOSTIC_STATUS;
-	ram = NMI_DISABLE(ram);
-	cmos_select_ram(ram);
+    ram = CMOS_DIAGNOSTIC_STATUS;
+    ram = NMI_DISABLE(ram);
+    cmos_select_ram(ram);
 
-	return cmos_read_ram();
+    return cmos_read_ram();
 }
 
-#define return_time(time)	\
-	do {	\
-		int ram = NMI_DISABLE(time);	\
-		cmos_select_ram(ram);	\
-		return BCD_TO_INT(cmos_read_ram());	\
-	} while(0);
+#define return_time(time)   \
+    do {    \
+        int ram = NMI_DISABLE(time);    \
+        cmos_select_ram(ram);   \
+        return BCD_TO_INT(cmos_read_ram()); \
+    } while(0);
 
 static int rtc_get_sec()
 {
-	return_time(RTC_CUR_SEC);
+    return_time(RTC_CUR_SEC);
 }
 static int rtc_get_min()
 {
-	return_time(RTC_CUR_MIN);
+    return_time(RTC_CUR_MIN);
 }
 static int rtc_get_hour()
 {
-	return_time(RTC_CUR_HOUR);
+    return_time(RTC_CUR_HOUR);
 }
 #undef return_time
 
 /*
  * Returns time in an integer. Do shifting to extract specific values.
  * Bytes:
- * 		0 - 7:	seconds
- * 		8 -15:	minutes
- * 		16-23:	hours
- * 		24-31:	unused
+ *      0 - 7:  seconds
+ *      8 -15:  minutes
+ *      16-23:  hours
+ *      24-31:  unused
  */
 int rtc_get_time()
 {
-	int time = 0;
+    int time = 0;
 
-	/* busy loop while the RTC is updating itself */
-	while (rtc_in_update())
-		;
+    /* busy loop while the RTC is updating itself */
+    while (rtc_in_update())
+        ;
 
-	time |= rtc_get_sec();
-	time |= (rtc_get_min() << 8);
-	time |= (rtc_get_hour() << 16);
+    time |= rtc_get_sec();
+    time |= (rtc_get_min() << 8);
+    time |= (rtc_get_hour() << 16);
 
-	return time;
+    return time;
 }
 
 /*
@@ -160,21 +160,21 @@ int rtc_get_time()
  */
 int cmos_init()
 {
-	int res;
+    int res;
 
-	res = cmos_diagnostic();
-	if (res)
-	{
-		/* if CMOS battery is not present, have to set the error bit off */
-		if (res & CMOS_DIAGNOSTIC_RTC_LOST_POWER)
-		{
-			res &= ~CMOS_DIAGNOSTIC_RTC_LOST_POWER;
-			cmos_select_ram(CMOS_DIAGNOSTIC_STATUS);
-			cmos_write_ram(res);
-		}
-		else
-			return -1; /* other diagnostic errors mean something not good */
-	}
+    res = cmos_diagnostic();
+    if (res)
+    {
+        /* if CMOS battery is not present, have to set the error bit off */
+        if (res & CMOS_DIAGNOSTIC_RTC_LOST_POWER)
+        {
+            res &= ~CMOS_DIAGNOSTIC_RTC_LOST_POWER;
+            cmos_select_ram(CMOS_DIAGNOSTIC_STATUS);
+            cmos_write_ram(res);
+        }
+        else
+            return -1; /* other diagnostic errors mean something not good */
+    }
 
-	return 0;
+    return 0;
 }

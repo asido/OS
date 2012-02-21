@@ -1,7 +1,7 @@
 ;******************************************************************************
-;		Interrupt handle wrappers
+;       Interrupt handle wrappers
 ;
-;			Author: Arvydas Sidorenko
+;           Author: Arvydas Sidorenko
 ;******************************************************************************
 
 ; CPU exception handlers
@@ -48,12 +48,12 @@ section .text
 align 4
 
 %macro HANDLE 1 
-	pushad
-	cli
-	call %1
-	sti
-	popad
-	iret
+    pushad
+    cli
+    call %1
+    sti
+    popad
+    iret
 %endmacro
 
 ;-----------------------------
@@ -61,52 +61,52 @@ align 4
 ;-----------------------------
 
 x86_divide_handle:
-	HANDLE x86_divide_except
+    HANDLE x86_divide_except
 
 x86_single_step_debug_handle:
-	HANDLE x86_single_step_debug_except
-	
+    HANDLE x86_single_step_debug_except
+    
 x86_nonmask_handle:
-	HANDLE x86_nonmask_except
+    HANDLE x86_nonmask_except
 
 x86_breakpoint_handle:
-	HANDLE x86_breakpoint_except
+    HANDLE x86_breakpoint_except
 
 x86_overflow_handle:
-	HANDLE x86_overflow_except
+    HANDLE x86_overflow_except
 
 x86_bound_handle:
-	HANDLE x86_bound_except
+    HANDLE x86_bound_except
 
 x86_invalid_opcode_handle:
-	HANDLE x86_invalid_opcode_except
+    HANDLE x86_invalid_opcode_except
 
 x86_busy_coproc_handle:
-	HANDLE x86_busy_coproc_except
+    HANDLE x86_busy_coproc_except
 
 x86_double_fault_handle:
-	HANDLE x86_double_fault_except
-	
+    HANDLE x86_double_fault_except
+    
 x86_coproc_overrun_handle:
-	HANDLE x86_coproc_overrun_except
+    HANDLE x86_coproc_overrun_except
 
 x86_invalid_tss_handle:
-	HANDLE x86_invalid_tss_except
+    HANDLE x86_invalid_tss_except
 
 x86_no_segment_handle:
-	HANDLE x86_no_segment_except
+    HANDLE x86_no_segment_except
 
 x86_stack_handle:
-	HANDLE x86_stack_except
+    HANDLE x86_stack_except
 
 x86_gpf_handle:
-	HANDLE x86_gpf_except
+    HANDLE x86_gpf_except
 
 x86_page_fault_handle:
-	HANDLE x86_page_fault_except
+    HANDLE x86_page_fault_except
 
 x86_coproc_handle:
-	HANDLE x86_coproc_except
+    HANDLE x86_coproc_except
 
 
 ;-----------------------------
@@ -114,7 +114,7 @@ x86_coproc_handle:
 ;-----------------------------
 
 x86_i8253_irq_handle:
-	HANDLE x86_i8253_irq_do_handle
+    HANDLE x86_i8253_irq_do_handle
 
 x86_kbr_irq_handle:
-	HANDLE x86_kbr_irq_do_handle
+    HANDLE x86_kbr_irq_do_handle
