@@ -10,6 +10,8 @@
 #include <x86/cmos.h>
 #include "mm.h"
 #include "time.h"
+#include "shell.h"
+#include "linklist.h"
 
 extern inline void kernel_panic(char *msg);
 
@@ -69,9 +71,8 @@ int kmain(struct boot_info binfo)
     if (cmos_init())
         kernel_panic("CMOS init error");
 
-    int *mem1 = (int *) kalloc(4088);
-    int *mem2 = (int *) kalloc(21439345);
-    int *mem3 = (int *) kalloc(5000);
+    if (shell_init(" $ "))
+        kernel_panic("Shell init error");
 
     goto_xy(10,10);
     printf("Memory size: %dKb\n", binfo.mem_size);
@@ -79,6 +80,22 @@ int kmain(struct boot_info binfo)
     printf("Kernel size: %dKb\n", binfo.krnl_size);
     goto_xy(10,12);
     printf("Kernel loc: 0x%x\n", binfo.krnl_loc);
+
+    struct test_t {
+        struct llist_t ll;
+        int a;
+        int b;
+        int c;
+    };
+
+    struct test_t test1;
+    struct test_t test2;
+    struct test_t test3;
+    struct test_t test4;
+    llist_init(&test1, ll);   
+    llist_add_before(&test1, &test2, ll);
+    llist_add_before(&test1, &test3, ll);
+    llist_add_before(&test1, &test4, ll);
 
     for (;;)
     {
