@@ -203,8 +203,8 @@ static inline int is_page_dirty(union entry_t *entry)
 
 /*
  * Check a sequence of `cnt` entries for a present flag.
- * Returns 0 if all passed,
- * or position of the first reached false condition.
+ * Returns 1 if all passed,
+ * or negative position of the first reached false condition.
  */
 static int sequence_is_present(union entry_t *entry, size_t cnt)
 {
@@ -213,10 +213,10 @@ static int sequence_is_present(union entry_t *entry, size_t cnt)
     for (i = 0; i < cnt; i++, entry += BYTES_PER_PTE)
     {
         if (is_present(entry))
-            return i;
+            return -i;
     }
 
-    return 0;
+    return 1;
 }
 
 /*
@@ -380,6 +380,11 @@ static addr_t find_block_reuse(struct pd_t *pd, size_t b, range_t *lookup_range)
     return 0;
 }
 
+inline static int pt_has_free_pgs(struct pt_t *pt, size_t pg_cnt)
+{
+    return (PT_ENTRY_CNT - pt->used_entries) >= pg_cnt;
+}
+
 /*
  * Finds a sequence of available VA addresses to fit `cnt` pages.
  */
@@ -390,7 +395,7 @@ static addr_t find_blocks(struct pd_t *pd, size_t cnt, range_t *lookup_range)
     size_t found;
     addr_t found_start;
 
-    if (cnt == 0 || cnt > (lookup_range->to - lookup_range->from))
+    if (cnt == 0 || cnt > (lookup_range->to - lookup_range->from) / PAGE_SIZE)
         return 0;
 
     for (va = lookup_range->from, found = 0, found_start = 0;
@@ -411,11 +416,11 @@ static addr_t find_blocks(struct pd_t *pd, size_t cnt, range_t *lookup_range)
             if (is_present(&pt->table[i]))
                 continue;
             
-            for (j = i + 1; j < cnt && j < PT_ENTRY_CNT; j++)
+            for (j = i; j < PT_ENTRY_CNT; j++)
             {
                 int look_cnt = MIN(PT_ENTRY_CNT - j, cnt);
-                int seq = sequence_is_present(pt->table, look_cnt);
-                if (seq == 0)
+                int seq = sequence_is_present(&pt->table[j], look_cnt);
+                if (seq == 1)
                 {
                     if (found == 0)
                         found_start = va + (j * PAGE_SIZE);
@@ -425,6 +430,7 @@ static addr_t find_blocks(struct pd_t *pd, size_t cnt, range_t *lookup_range)
                 {
                     found = 0;
                     found_start = 0;
+                    j += ABS(seq);
                 }
 
                 if (found >= cnt)
@@ -446,17 +452,26 @@ static int do_alloc_pages(addr_t va, size_t pg_count)
     size_t i;
     void *mem;
     union entry_t *entry;
+    struct pt_t *pt;
 
     for (i = 0; i < pg_count; i++)
     {
+        /* get a physical memory */
         mem = pmm_alloc(PAGE_SIZE);
         if (!mem)
             return -1;
 
+        /* map physical memory to va */
         entry = va_to_pt_entry(vmm.cur_pd, va + (i * PAGE_SIZE));
         entry_add_frame(entry, (addr_t) mem);
         entry_add_flag(entry, ENTRY_PRESENT);
         entry_add_flag(entry, ENTRY_RW);
+
+        /* update the PT */
+        pt = va_to_pd_pt(vmm.cur_pd, va);
+        pt->used_entries++;
+        if (pt->used_entries >= FULL_PTE_LIMIT)
+            pt->full_entries++;
     }
 
     return 0;

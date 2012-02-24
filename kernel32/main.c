@@ -73,8 +73,9 @@ int kmain(struct boot_info binfo)
     if (cmos_init())
         kernel_panic("CMOS init error");
 
-    int *mem = (int *) kalloc(5000);
-    *mem = 0xDEAD;
+    int *mem1 = (int *) kalloc(5000);
+    int *mem2 = (int *) kalloc(5000);
+    int *mem3 = (int *) kalloc(5000);
 
     goto_xy(10,10);
     printf("Memory size: %dKb\n", binfo.mem_size);
