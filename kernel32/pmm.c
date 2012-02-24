@@ -154,8 +154,9 @@ void *pmm_alloc(unsigned int bytes)
     if (!pmm.blocks_free || pmm.blocks_free < block_count)
         return NULL;
 
+    error = 0;
     idx = find_free_blocks(block_count);
-    if (idx == -ENOMEM)
+    if (error == ENOMEM)
         kernel_panic("PMM: out of memory");
 
     pmm.blocks_free -= block_count;

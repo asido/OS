@@ -8,8 +8,6 @@
 #include <error.h>
 #include "mm.h"
 
-extern inline void kernel_panic(char *msg);
-
 #define CR0_ENABLE_PAGING 0x80000000
 
 #define BIOS_PD_PA 0x9C000

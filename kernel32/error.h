@@ -12,6 +12,9 @@
 #define EBADADDR 2  /* bad address */
 #define EBADARG 3   /* bad argument */
 #define EFAULT 4    /* unexpected behaviour */
+#define ESIZE 5     /* entity too large/small */
+
+extern int error;
 
 inline void kernel_panic(char *msg);
 

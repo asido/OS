@@ -7,6 +7,8 @@
 #include <libc.h>
 #include <x86/cpu.h>
 
+int error = 0;
+
 /*
  * Internal kernel error handler.
  * NOTE: CPU is halted after it's call.
