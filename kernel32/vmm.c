@@ -465,7 +465,7 @@ static int do_alloc_pages(addr_t va, size_t pg_count)
         /* update the PT */
         pt = va_to_pd_pt(vmm.cur_pd, va);
         pt->used_entries++;
-        if (pt->used_entries >= FULL_PTE_LIMIT)
+        if (pt->used_entries == FULL_PTE_LIMIT)
             pt->full_entries++;
     }
 
@@ -530,7 +530,49 @@ inline static void *unmark_size(void *mem)
 
 inline static size_t get_mark_size(void *mem)
 {
-    return *((int *) mem - MEM_MARK_SIZE);
+    return *((int *) (mem - MEM_MARK_SIZE));
+}
+
+/*
+ * Does the actual memory deallocation, so that [km]alloc could use it.
+ */
+static int dealloc_bytes(void *ptr, size_t b)
+{
+    size_t i;
+    size_t block_cnt = bytes_to_blocks(b);
+    addr_t addr = (addr_t) ptr;
+    struct pt_t *pt;
+    union entr_t *entry;
+    
+    if (!block_cnt || !ptr)
+        return -1;
+
+    for (i = 0; i < block_cnt; i++, addr += PAGE_SIZE)
+    {
+        entry = va_to_pt_entry(vmm.cur_pd, addr);   
+        entry_rm_flag(entry, ENTRY_PRESENT);
+        
+        pt = va_to_pd_pt(vmm.cur_pd, addr);
+        pt->used_entries--;
+        if (pt->full_entries == FULL_PTE_LIMIT - 1)
+            pt->full_entries--;
+        /* if (!pt->used_entries) */
+        /*     entry_rm_flag(&pt->pt_pa, ENTRY_PRESENT); */
+    }
+}
+
+/*
+ * Frees previously allocated memory chunk.
+ */
+void free(void *ptr)
+{
+    size_t b = get_mark_size(ptr);
+
+    if (!b)
+        return;
+
+    ptr = unmark_size(ptr);
+    dealloc_bytes(ptr, b);
 }
 
 /*
@@ -557,7 +599,7 @@ void *malloc(size_t bytes)
     void *va;
 
     bytes += MEM_MARK_SIZE;
-    va = alloc_bytes(vmm.cur_pd, bytes + MEM_MARK_SIZE, MEM_USR);
+    va = alloc_bytes(vmm.cur_pd, bytes, MEM_USR);
     if (!va)
         return 0;
     va = mark_size(va, bytes);
