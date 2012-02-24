@@ -11,10 +11,6 @@
 #include "mm.h"
 #include "time.h"
 
-extern addr_t pmm_init(unsigned int mem_kb, addr_t bitmap_loc);
-extern int pmm_init_region(unsigned int addr, size_t size);
-extern int pmm_dealloc(unsigned int addr, size_t size);
-extern void *kalloc(size_t bytes);
 extern inline void kernel_panic(char *msg);
 
 static char* logo =
@@ -74,8 +70,7 @@ int kmain(struct boot_info binfo)
         kernel_panic("CMOS init error");
 
     int *mem1 = (int *) kalloc(4088);
-    free((void *)mem1);
-    int *mem2 = (int *) kalloc(5000);
+    int *mem2 = (int *) kalloc(21439345);
     int *mem3 = (int *) kalloc(5000);
 
     goto_xy(10,10);
