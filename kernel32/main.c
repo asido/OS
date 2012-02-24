@@ -73,7 +73,7 @@ int kmain(struct boot_info binfo)
     if (cmos_init())
         kernel_panic("CMOS init error");
 
-    int *mem1 = (int *) kalloc(5000);
+    int *mem1 = (int *) kalloc(4088);
     int *mem2 = (int *) kalloc(5000);
     int *mem3 = (int *) kalloc(5000);
 

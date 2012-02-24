@@ -380,11 +380,6 @@ static addr_t find_block_reuse(struct pd_t *pd, size_t b, range_t *lookup_range)
     return 0;
 }
 
-inline static int pt_has_free_pgs(struct pt_t *pt, size_t pg_cnt)
-{
-    return (PT_ENTRY_CNT - pt->used_entries) >= pg_cnt;
-}
-
 /*
  * Finds a sequence of available VA addresses to fit `cnt` pages.
  */
@@ -492,15 +487,18 @@ static void *alloc_bytes(struct pd_t *pd, size_t b, enum mem_area area)
     if (!block_cnt && !last_blc_sz)
         return 0;
 
-    if (block_cnt == 1 && last_blc_sz < FULL_PTE_LIMIT)
-    {
-        va = find_block_reuse(pd, b, lookup_range);
-        if (!va)
-            va = find_blocks(pd, 1, lookup_range);
-        if (!va)
-            return 0;
-    }
-    else
+/*
+ *  Re-usable blocks are not implemented yet
+ */
+    /* if (block_cnt == 1 && last_blc_sz < FULL_PTE_LIMIT) */
+    /* { */
+    /*     va = find_block_reuse(pd, b, lookup_range); */
+    /*     if (!va) */
+    /*         va = find_blocks(pd, 1, lookup_range); */
+    /*     if (!va) */
+    /*         return 0; */
+    /* } */
+    /* else */
     {
         va = find_blocks(pd, block_cnt, lookup_range);
         if (!va)
@@ -532,7 +530,7 @@ inline static void *unmark_size(void *mem)
 
 inline static size_t get_mark_size(void *mem)
 {
-    return *((int *) mem);
+    return *((int *) mem - MEM_MARK_SIZE);
 }
 
 /*
@@ -540,8 +538,10 @@ inline static size_t get_mark_size(void *mem)
  */
 void *kalloc(size_t bytes)
 {
-    void *va = alloc_bytes(vmm.cur_pd, bytes, MEM_KRNL);
+    void *va;
 
+    bytes += MEM_MARK_SIZE;
+    va = alloc_bytes(vmm.cur_pd, bytes + MEM_MARK_SIZE, MEM_KRNL);
     if (!va)
         return 0;
     va = mark_size(va, bytes);
@@ -554,8 +554,10 @@ void *kalloc(size_t bytes)
  */
 void *malloc(size_t bytes)
 {
-    void *va = alloc_bytes(vmm.cur_pd, bytes, MEM_USR);
+    void *va;
 
+    bytes += MEM_MARK_SIZE;
+    va = alloc_bytes(vmm.cur_pd, bytes + MEM_MARK_SIZE, MEM_USR);
     if (!va)
         return 0;
     va = mark_size(va, bytes);
