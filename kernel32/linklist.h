@@ -42,4 +42,18 @@ struct llist_t {
         (ll_memb)->ll_field.prev = &(data)->ll_field;  \
     } while (0);
 
+/*
+ * Retrieves the next element.
+ */
+#define llist_next(ll_memb, ll_field) \
+    ((typeof(ll_memb)) (ll_memb)->ll_field.next)
+
+/*
+ * Retrieves previous element.
+ */
+#define llist_prev(ll_memb, ll_field) \
+    ((typeof(ll_memb)) (ll_memb)->ll_field.prev)
+
+/* TODO: delete & foreach */
+
 #endif /* end of include guard: LINKLIST_OUJCFBOR */
