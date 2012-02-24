@@ -5,6 +5,7 @@
  ******************************************************************************/
 
 #include <libc.h>
+#include <error.h>
 #include "mm.h"
 
 #define BLOCK_SIZE 4096 /* same size as VMM block size */
@@ -121,20 +122,20 @@ static unsigned int find_free_blocks(int count)
     size_t i;
 
     if (!pmm.blocks_free)
-        return -1;
+        return -ENOMEM;
 
     for (i = 0; i < pmm.block_cnt; i++)
         if (!is_map_idx_full(i))
         {
             int free_bit = get_free_bit(mem_bitmap[i]);
             if (free_bit < 0)
-                return -1;
+                return -ENOMEM;
             int bit_idx = BITMAP_IDX_TO_BLOCK_IDX(i) + free_bit;
             if (is_free_sequence(bit_idx, count))
                 return bit_idx;
         }
 
-    return -2;
+    return -EFAULT;
 }
 
 /*
@@ -154,8 +155,8 @@ void *pmm_alloc(unsigned int bytes)
         return NULL;
 
     idx = find_free_blocks(block_count);
-    if (idx <= 0)
-        return NULL;
+    if (idx == -ENOMEM)
+        kernel_panic("PMM: out of memory");
 
     pmm.blocks_free -= block_count;
     for (i = 0; i < block_count; i++)

@@ -5,6 +5,7 @@
  ******************************************************************************/
 
 #include <libc.h>
+#include <error.h>
 #include "mm.h"
 
 extern inline void kernel_panic(char *msg);
@@ -454,7 +455,7 @@ static int do_alloc_pages(addr_t va, size_t pg_count)
         /* get a physical memory */
         mem = pmm_alloc(PAGE_SIZE);
         if (!mem)
-            return -1;
+            return -ENOMEM;
 
         /* map physical memory to va */
         entry = va_to_pt_entry(vmm.cur_pd, va + (i * PAGE_SIZE));
@@ -545,7 +546,7 @@ static int dealloc_bytes(void *ptr, size_t b)
     union entry_t *entry;
     
     if (!block_cnt || !ptr)
-        return -1;
+        return -EBADADDR;
 
     for (i = 0; i < block_cnt; i++, addr += PAGE_SIZE)
     {
