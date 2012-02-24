@@ -542,7 +542,7 @@ static int dealloc_bytes(void *ptr, size_t b)
     size_t block_cnt = bytes_to_blocks(b);
     addr_t addr = (addr_t) ptr;
     struct pt_t *pt;
-    union entr_t *entry;
+    union entry_t *entry;
     
     if (!block_cnt || !ptr)
         return -1;
@@ -559,6 +559,8 @@ static int dealloc_bytes(void *ptr, size_t b)
         /* if (!pt->used_entries) */
         /*     entry_rm_flag(&pt->pt_pa, ENTRY_PRESENT); */
     }
+
+    return 0;
 }
 
 /*
