@@ -15,6 +15,26 @@
 unsigned long long pit_jiffy = 0;
 
 /*
+ * 64 bit mod operation.
+ * The OS runs in 32 bit mode and pit jiffy is 64 bits in size,
+ * so the hardware can't do that natively.
+ */
+static unsigned int pit_mod(unsigned long long jiffy, unsigned int mod_val)
+{
+    int val = 0;
+
+    __asm__ ("movl %1, %%eax\n"
+             "xor %%edx, %%edx\n"
+             "div %2\n"
+             "mov %%dx, %0\n"
+         : "=m" (val)
+         : "m" (jiffy), "r" (mod_val)
+         : "eax", "edx");
+
+    return val;
+}
+
+/*
  * PIT IRQ0 interrupt handler
  */
 void x86_i8253_irq_do_handle()
@@ -26,8 +46,7 @@ void x86_i8253_irq_do_handle()
     cursor_load();
 
     /* XXX: ugly! need to do registered callback subsystem */
-    int jif = pit_jiffy & 0xFFFFFFFF;
-    if (jif % PIT_HZ == 0)
+    if (pit_mod(pit_jiffy, 1000) == 0)
         update_clock();
 
     irq_done(IRQ0_VECTOR);
