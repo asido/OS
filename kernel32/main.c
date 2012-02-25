@@ -89,13 +89,24 @@ int kmain(struct boot_info binfo)
     };
 
     struct test_t test1;
+    test1.a = 1;
     struct test_t test2;
+    test2.a = 2;
     struct test_t test3;
+    test3.a = 3;
     struct test_t test4;
+    test4.a = 4;
     llist_init(&test1, ll);   
     llist_add_before(&test1, &test2, ll);
     llist_add_before(&test1, &test3, ll);
     llist_add_before(&test1, &test4, ll);
+
+    struct test_t *loop;
+    size_t s;
+    llist_foreach(&test1, loop, s, ll)
+    {
+        printf("%d", loop->a);
+    }
 
     for (;;)
     {

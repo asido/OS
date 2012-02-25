@@ -1,7 +1,8 @@
 /******************************************************************************
  *      Linked list implementation
  *
- *  NOTE: struct llist_t should be the first member of the structure.
+ *      The list is round - last member has pointer to the first
+ *      and the first has a pointer to the last.
  *
  *          Author: Arvydas Sidorenko
  ******************************************************************************/
@@ -12,7 +13,6 @@
 #include "mm.h"
 
 struct llist_t {
-    struct llist_t *begin;
     struct llist_t *next;
     struct llist_t *prev;
 };
@@ -23,7 +23,6 @@ struct llist_t {
 #define llist_init(ptr, ll_field)  \
     do {    \
         /* since the list is empty, everything points to itself */  \
-        (ptr)->ll_field.begin = ((struct llist_t *) (ptr));    \
         (ptr)->ll_field.next = ((struct llist_t *) (ptr));     \
         (ptr)->ll_field.prev = ((struct llist_t *) (ptr));     \
     } while (0);
@@ -34,7 +33,6 @@ struct llist_t {
 #define llist_add_before(ll_memb, data, ll_field)  \
     do {    \
         /* set new members ll */   \
-        (data)->ll_field.begin = (ll_memb)->ll_field.begin;     \
         (data)->ll_field.prev = (ll_memb)->ll_field.prev;       \
         (data)->ll_field.next = &(ll_memb)->ll_field;       \
         /* merge it before a given `ll_memb` */     \
@@ -54,6 +52,42 @@ struct llist_t {
 #define llist_prev(ll_memb, ll_field) \
     ((typeof(ll_memb)) (ll_memb)->ll_field.prev)
 
-/* TODO: delete & foreach */
+/*
+ * Returns true if `list` has 1 member only.
+ */
+#define llist_is_empty(list, ll_field)  \
+    ((list)->ll_field.next == (list))
+
+/*
+ * Deletes a member from the list.
+ */
+#define llist_delete(memb, ll_field)    \
+    do {    \
+        if ((memb)->ll_field.next == (memb))    \
+            break;  \
+    \
+        (memb)->ll_field.prev->next = (memb)->ll_field.next;     \
+        (memb)->ll_field.next->prev = (memb)->ll_field.prev;     \
+        (memb)->ll_field.next = NULL;    \
+        (memb)->ll_field.prev = NULL;    \
+    } while (0);
+
+/*
+ * Returns true if `memb` bellongs to any list.
+ */
+#define llist_is_in_list(memb, ll_field)    \
+    ((memb)->ll_field.next != NULL && (memb)->ll_field.prev != NULL)
+
+/*
+ * Macro to loop through whole linked list.
+ *  list    - starting point
+ *  entry   - struct pointer which will hold each looped entry
+ *  counter - counter which gets incremented with every loop
+ *  ll_field- name of linked list variable
+ */
+#define llist_foreach(list, entry, counter, ll_field)   \
+    for ((entry) = ((typeof((entry))) (list)), counter = 0;  \
+         (entry) != (list) || counter == 0; \
+         (entry) = ((typeof((entry))) (entry)->ll_field.next), counter++)
 
 #endif /* end of include guard: LINKLIST_OUJCFBOR */
