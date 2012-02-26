@@ -10,8 +10,6 @@
 #ifndef LINKLIST_OUJCFBOR
 #define LINKLIST_OUJCFBOR
 
-#include "mm.h"
-
 struct llist_t {
     struct llist_t *next;
     struct llist_t *prev;

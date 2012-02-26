@@ -52,6 +52,8 @@ int kmain(struct boot_info binfo)
                          "movl %%eax, %%esp \n"
                         : : : "eax");
 
+    clock_init();
+
     if (screen_init())
         kernel_panic("screen init error");
     if (x86_init())
@@ -80,33 +82,6 @@ int kmain(struct boot_info binfo)
     printf("Kernel size: %dKb\n", binfo.krnl_size);
     goto_xy(10,12);
     printf("Kernel loc: 0x%x\n", binfo.krnl_loc);
-
-    struct test_t {
-        struct llist_t ll;
-        int a;
-        int b;
-        int c;
-    };
-
-    struct test_t test1;
-    test1.a = 1;
-    struct test_t test2;
-    test2.a = 2;
-    struct test_t test3;
-    test3.a = 3;
-    struct test_t test4;
-    test4.a = 4;
-    llist_init(&test1, ll);   
-    llist_add_before(&test1, &test2, ll);
-    llist_add_before(&test1, &test3, ll);
-    llist_add_before(&test1, &test4, ll);
-
-    struct test_t *loop;
-    size_t s;
-    llist_foreach(&test1, loop, s, ll)
-    {
-        printf("%d", loop->a);
-    }
 
     for (;;)
     {

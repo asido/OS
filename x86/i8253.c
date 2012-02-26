@@ -6,6 +6,7 @@
 
 #include <libc.h>
 #include <time.h>
+#include <callback.h>
 #include "cpu.h"
 #include "i8253.h"
 #include "i8259.h"
@@ -45,9 +46,8 @@ void x86_i8253_irq_do_handle()
     printf("%d", pit_jiffy);
     cursor_load();
 
-    /* XXX: ugly! need to do registered callback subsystem */
-    if (pit_mod(pit_jiffy, 1000) == 0)
-        update_clock();
+    update_clock_pit(PIT_HZ);
+    check_callbacks();
 
     irq_done(IRQ0_VECTOR);
 }
