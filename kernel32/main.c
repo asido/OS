@@ -35,7 +35,18 @@ static int screen_init()
     clear_screen();
     goto_xy(0, 0);
     puts(logo);
+
     return 0;
+}
+
+static void os_loop()
+{
+    while (1)
+    {
+        __asm__ __volatile__ ("sti\n"
+                              "hlt\n"
+                            : : : "memory");
+    }
 }
 
 /* Kernel entry point */
@@ -83,9 +94,7 @@ int kmain(struct boot_info binfo)
     goto_xy(10,12);
     printf("Kernel loc: 0x%x\n", binfo.krnl_loc);
 
-    for (;;)
-    {
-    }
+    os_loop();
 
     return 0;
 }
