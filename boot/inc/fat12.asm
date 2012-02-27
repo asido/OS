@@ -172,6 +172,7 @@ _LOAD_FILE:
     xor bx, bx  ; higher counter
     xor cx, cx  ; lower counter
     mov dx, WORD [bp+4]
+    jmp .LoopFirst
 
     ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ; FAT entry value meanings:
@@ -182,6 +183,12 @@ _LOAD_FILE:
     ;   (anything else) - the next cluster of file
     ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .LoopMain:
+    ; check if last loaded cluster was the last one.
+    cmp si, 0xFF8
+    jb .ContinueNextLoad
+    cmp si, 0xFFF
+    jbe .Return
+.ContinueNextLoad:
     mov dx, si
 .LoopFirst:
     push dx
@@ -191,7 +198,7 @@ _LOAD_FILE:
     je .LoopMain
     ; if FAT entry >= 0xFF0
     cmp ax, 0xFF0
-    ja .Return
+    je .Error
     mov si, ax
     inc cx
     ; increment BX if we got 0xFFFF overflow
