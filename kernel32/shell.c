@@ -23,7 +23,7 @@ static char *prompt;
 static char *cmd_buf;
 
 /*
- * Sets shell prompt.
+ * Sets shell prompt string.
  */
 static int set_prompt(char *prmpt)
 {
@@ -38,17 +38,17 @@ static int set_prompt(char *prmpt)
     return 0;
 }
 
+/*
+ * Draws the prompt.
+ */
 static void prompt_draw()
 {
     printf("%s", prompt);
 }
 
-static void prompt_init()
-{
-    goto_xy(0, 1);
-    prompt_draw();
-}
-
+/*
+ * Redraws the header.
+ */
 static void header_redraw()
 {
     size_t i;
@@ -70,6 +70,9 @@ static void header_redraw()
     cursor_load();
 }
 
+/*
+ * Redraws the footer.
+ */
 static void footer_redraw()
 {
     size_t i;
@@ -87,6 +90,9 @@ static void footer_redraw()
     cursor_load();
 }
 
+/*
+ * Redraws the whole screen leaving shell header and footer untouched.
+ */
 static void content_redraw()
 {
     size_t i, sz;
@@ -98,8 +104,7 @@ static void content_redraw()
     sz = MAX_CRS_X * (MAX_CRS_Y - 2);
     for (i = 0; i < sz; i++)
         putchar(' ');
-
-    prompt_init();
+    goto_xy(0, 1);
 
     /* 
      * Don't cursor_load(), because this is where all output
@@ -107,34 +112,68 @@ static void content_redraw()
      */
 }
 
+static void print_help()
+{
+    puts("AxidOS commands:");
+    puts("  help - prints this help");
+    puts("  clear - clears the screen");
+}
+
+/*
+ * Executes a command.
+ */
 static int exec_cmd(char *cmd)
 {
-    printf("  No such command: %s", cmd);
-    puts("");
+    if (strcmp(cmd, "help") == 0)
+        print_help();
+    else if (strcmp(cmd, "clear") == 0)
+        content_redraw();
+    else if (strcmp(cmd, "info") == 0)
+        info_main(1, &cmd);
+    else if (strcmp(cmd, "") != 0)
+    {
+        printf("  No such command: %s", cmd);
+        puts("");
+    }
 
     return 0;
 }
 
+/*
+ * Callback function by keyboard driver whenever a new char gets available.
+ */
 void shell_kbrd_cb(char c)
 {
-    static int kbrd_idx = 0;
-
-    putchar(c);
+    static unsigned int kbrd_idx = 0;
 
     if (c == '\r')
     {
+        putchar(c);
         cmd_buf[kbrd_idx] = '\0';
         exec_cmd(cmd_buf);
         kbrd_idx = 0;
         prompt_draw();
     }
+    else if (c == '\b')
+    {
+        if (kbrd_idx > 0)
+        {
+            putchar(c);
+            kbrd_idx--;
+            cmd_buf[kbrd_idx] = '\0';
+        }
+    }
     else
     {
+        putchar(c);
         cmd_buf[kbrd_idx] = c;
         kbrd_idx++;
     }
 }
 
+/*
+ * Callback function every second.
+ */
 static void update_time_cb(void *data)
 {
     header_redraw();
@@ -159,6 +198,11 @@ int shell_init(char *prmpt)
     header_redraw();
     footer_redraw();
     content_redraw();
+
+    goto_xy(0, 1);
+    puts("Welcome to AxidOS! Type 'help' for help.");
+    goto_xy(0, 3);
+    prompt_draw();
 
     /* 4KB hopefully is enough */
     cmd_buf = (char *) kalloc(4000);

@@ -77,7 +77,7 @@ int kmain(struct boot_info binfo)
     if (cmos_init())
         kernel_panic("CMOS init error");
 
-    if (shell_init("[asido@slacker]$ "))
+    if (shell_init("[axidos]$ "))
         kernel_panic("Shell init error");
 
     os_loop();
