@@ -9,6 +9,8 @@
 #include <callback.h>
 #include <mm.h>
 
+extern int info_main(int argc, const char *argv[]);
+
 #define PROMPT_SIZE 30
 
 /* Default colors */
@@ -18,6 +20,8 @@
 #define SHELL_HEAD_CLR_FG VID_CLR_LIGHT_RED
 #define SHELL_FOOT_CLR_BG VID_CLR_DARK_GRAY
 #define SHELL_FOOT_CLR_FG VID_CLR_LIGHT_RED
+#define SHELL_PROMPT_BG SHELL_CLR_BG
+#define SHELL_PROMPT_FG VID_CLR_WHITE
 
 static char *prompt;
 static char *cmd_buf;
@@ -43,7 +47,12 @@ static int set_prompt(char *prmpt)
  */
 static void prompt_draw()
 {
+    /* color_save(); */
+    /* cursor_save(); */
+    set_color(SHELL_PROMPT_BG, SHELL_PROMPT_FG);
     printf("%s", prompt);
+    set_color(SHELL_CLR_BG, SHELL_CLR_FG);
+    /* color_load(); */
 }
 
 /*
@@ -115,8 +124,9 @@ static void content_redraw()
 static void print_help()
 {
     puts("AxidOS commands:");
-    puts("  help - prints this help");
-    puts("  clear - clears the screen");
+    puts("\thelp - prints this help");
+    puts("\tclear - clears the screen");
+    puts("\tinfo - prints some info about the system");
 }
 
 /*
@@ -201,11 +211,12 @@ int shell_init(char *prmpt)
 
     goto_xy(0, 1);
     puts("Welcome to AxidOS! Type 'help' for help.");
-    goto_xy(0, 3);
-    prompt_draw();
 
     /* 4KB hopefully is enough */
     cmd_buf = (char *) kalloc(4000);
+
+    /* simulate Enter press to show the prompt */
+    shell_kbrd_cb('\r');
 
     return 0;
 }

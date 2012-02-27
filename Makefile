@@ -51,8 +51,9 @@ default:
 	cd libc; make
 	cd x86; make
 	cd kernel32; make
+	cd apps; make
 	cd drivers/keyboard; make
-	$(LD) $(LDFLAGS) -o $(PROGRAM) libc/*.o drivers/keyboard/*.o x86/*.o kernel32/*.o
+	$(LD) $(LDFLAGS) -o $(PROGRAM) libc/*.o drivers/keyboard/*.o x86/*.o kernel32/*.o apps/*.o
 	./floppy.sh
 
 # Full rule, which first cleans all the build files and then does the build from scratch

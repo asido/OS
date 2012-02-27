@@ -39,6 +39,7 @@ enum ALIGN {
 struct pmm_t {
     unsigned int block_cnt;
     unsigned int blocks_free;
+    size_t krnl_size;
 };
 
 static struct pmm_t pmm;
@@ -55,6 +56,7 @@ addr_t pmm_init(unsigned int mem_kb, addr_t bitmap_loc)
     memset(mem_bitmap, 0xFF, SIZE_KB_TO_BLOCKS(mem_kb) / BITMAP_BIT_CNT);
     pmm.block_cnt = SIZE_KB_TO_BLOCKS(mem_kb);
     pmm.blocks_free = 0;
+    pmm.krnl_size = 0;
 
     return ((addr_t) mem_bitmap) + (pmm.block_cnt / BITMAP_BIT_CNT) + INT_BIT;
 }
@@ -138,9 +140,38 @@ static unsigned int find_free_blocks(int count)
     return -EFAULT;
 }
 
+/*
+ * Returns byte count of total memory.
+ */
+size_t get_total_mem_b()
+{
+    return pmm.block_cnt * BLOCK_SIZE;
+}
+
+/*
+ * Returns byte count of free memory.
+ */
 size_t get_free_mem_b()
 {
     return pmm.blocks_free * BLOCK_SIZE;
+}
+
+/*
+ * Returns byte count of used memory.
+ */
+size_t get_used_mem_b()
+{
+    return (pmm.block_cnt - pmm.blocks_free) * BLOCK_SIZE;
+}
+
+size_t get_krnl_size()
+{
+    return pmm.krnl_size;
+}
+
+void set_krnl_size(size_t sz)
+{
+    pmm.krnl_size = sz;
 }
 
 /*

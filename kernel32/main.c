@@ -13,15 +13,7 @@
 #include "shell.h"
 #include "linklist.h"
 
-extern inline void kernel_panic(char *msg);
-
 static char* logo = "";
-
-struct boot_info {
-    unsigned int mem_size;
-    unsigned int krnl_size;
-    unsigned int krnl_loc;
-} __attribute__((__packed__));
 
 static int screen_init()
 {
@@ -42,8 +34,10 @@ static void os_loop()
     }
 }
 
+struct boot_info *binfo;
+
 /* Kernel entry point */
-int kmain(struct boot_info binfo)
+int kmain(struct boot_info bi)
 {
     /* set segment values */
     __asm__ __volatile__("movw $0x10, %%ax \n"
@@ -56,6 +50,8 @@ int kmain(struct boot_info binfo)
                          "movl %%eax, %%esp \n"
                         : : : "eax");
 
+    binfo = &bi;
+
     clock_init();
 
     if (screen_init())
@@ -64,14 +60,15 @@ int kmain(struct boot_info binfo)
         kernel_panic("x86 init error");
 
     /* init PMM */
-    addr_t pmm_tbl_loc = binfo.krnl_loc + KB_TO_BYTE(binfo.krnl_size);
-    addr_t pmm_end = pmm_init(binfo.mem_size, pmm_tbl_loc);
+    addr_t pmm_tbl_loc = binfo->krnl_loc + KB_TO_BYTE(binfo->krnl_size);
+    addr_t pmm_end = pmm_init(binfo->mem_size, pmm_tbl_loc);
     int mem_avail_begin = MB_TO_BYTE(5); /* first 5MB reserved in boot loader */
-    int mem_avail_end = KB_TO_BYTE(binfo.mem_size);
+    int mem_avail_end = KB_TO_BYTE(binfo->mem_size);
     pmm_init_region(mem_avail_begin, mem_avail_end - mem_avail_begin);
+    set_krnl_size(binfo->krnl_size * 512);
 
     /* init VMM */
-    if (vmm_init(binfo.mem_size, pmm_end))
+    if (vmm_init(binfo->mem_size, pmm_end))
         kernel_panic("VMM init error");
 
     if (cmos_init())

@@ -66,6 +66,16 @@ void cursor_load()
     _color = _color_save;
 }
 
+/* void color_save() */
+/* { */
+/*     _color_save = _color; */
+/* } */
+/*  */
+/* void color_load() */
+/* { */
+/*     _color = _color_save; */
+/* } */
+
 /*
  * Sets memory location at `dest` to `val` for `count` bytes.
  * Returns `dest`
@@ -121,6 +131,7 @@ int putchar(int c)
         cursor_move_line(1);
         mov_forw = false;
         put_char = false;
+        break;
     case ('\t'):    /* tab */
         cursor_move(TAB_SIZE);
         mov_forw = false;
