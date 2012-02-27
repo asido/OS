@@ -138,6 +138,11 @@ static unsigned int find_free_blocks(int count)
     return -EFAULT;
 }
 
+size_t get_free_mem_b()
+{
+    return pmm.blocks_free * BLOCK_SIZE;
+}
+
 /*
  * Allocated `size` of blocks starting from `start`
  * Returns 0 on error.

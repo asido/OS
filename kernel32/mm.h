@@ -7,6 +7,7 @@ typedef unsigned int addr_t;
 addr_t pmm_init(unsigned int mem_kb, addr_t bitmap_loc);
 int pmm_init_region(unsigned int addr, size_t size);
 extern void *pmm_alloc(unsigned int bytes);
+size_t get_free_mem_b();
 
 /* VMM */
 int vmm_init(size_t mem_kb, addr_t krnl_bin_end);
