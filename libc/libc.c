@@ -121,6 +121,10 @@ int putchar(int c)
         cursor_move_line(1);
         mov_forw = false;
         put_char = false;
+    case ('\t'):    /* tab */
+        cursor_move(TAB_SIZE);
+        mov_forw = false;
+        put_char = false;
     }
 
     if (put_char)
