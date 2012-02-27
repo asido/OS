@@ -28,7 +28,7 @@ static int set_prompt(char *prmpt)
     return 0;
 }
 
-static void update_time(void *data)
+static void update_time_cb(void *data)
 {
     cursor_save();
     goto_xy(63, 0);
@@ -47,7 +47,7 @@ int shell_init(char *prmpt)
     struct time_t delay;
     delay.sec = 1;
     delay.day = delay.hour = delay.min = delay.mm = 0;
-    if (register_callback(CALLBACK_REPEAT, &delay, update_time))
+    if (register_callback(CALLBACK_REPEAT, &delay, update_time_cb))
         return -2;
 
     return 0;

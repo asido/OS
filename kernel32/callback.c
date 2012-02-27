@@ -39,6 +39,8 @@ int remove_callback(struct callback_t *cb)
         return -1;
 
     llist_delete(cb, ll);
+    if (llist_is_empty(cb_list, ll))
+        cb_list = NULL;
     free(cb);
     return 0;
 }
@@ -62,13 +64,16 @@ void check_callbacks()
 
     llist_foreach(cb_list, cb, idx, ll)
     {
+        /* if time to trigger the callback */
         if (cb->reg_time + cb->delay <= cur_milis)
         {
+            /* call the callback */
             cb->callback(NULL);
+            /* if the callback type is to repeat, re-register it */
             if (cb->type == CALLBACK_REPEAT)
                 cb->reg_time = cur_milis;
             else
-                llist_delete(cb, ll);
+                remove_callback(cb);
         }
     }
 }

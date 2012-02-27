@@ -54,16 +54,13 @@ struct llist_t {
  * Returns true if `list` has 1 member only.
  */
 #define llist_is_empty(list, ll_field)  \
-    ((list)->ll_field.next == (list))
+    (!(list)->ll_field.next || !(list)->ll_field.prev)
 
 /*
  * Deletes a member from the list.
  */
 #define llist_delete(memb, ll_field)    \
     do {    \
-        if ((memb)->ll_field.next == (memb))    \
-            break;  \
-    \
         (memb)->ll_field.prev->next = (memb)->ll_field.next;     \
         (memb)->ll_field.next->prev = (memb)->ll_field.prev;     \
         (memb)->ll_field.next = NULL;    \
