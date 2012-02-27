@@ -15,13 +15,7 @@
 
 extern inline void kernel_panic(char *msg);
 
-static char* logo =
-"\
-    ___              ____   ____\n\
-   /   |_  _  __    / __ \\/ ___/\n\
-  / /| |\\\\//||--\\\\ / / / /\\__ \\\n\
- / /_| | \\\\ |||_||/ /_/ /___/ /\n\
-/_/  |_|//\\\\||__//\\____/\\____/\n";
+static char* logo = "";
 
 struct boot_info {
     unsigned int mem_size;
@@ -34,7 +28,6 @@ static int screen_init()
     set_color(VID_CLR_LIGHT_BLUE, VID_CLR_WHITE);
     clear_screen();
     goto_xy(0, 0);
-    puts(logo);
 
     return 0;
 }
@@ -84,15 +77,8 @@ int kmain(struct boot_info binfo)
     if (cmos_init())
         kernel_panic("CMOS init error");
 
-    if (shell_init(" $ "))
+    if (shell_init("[asido@slacker]$ "))
         kernel_panic("Shell init error");
-
-    goto_xy(10,10);
-    printf("Memory size: %dKb\n", binfo.mem_size);
-    goto_xy(10,11);
-    printf("Kernel size: %dKb\n", binfo.krnl_size);
-    goto_xy(10,12);
-    printf("Kernel loc: 0x%x\n", binfo.krnl_loc);
 
     os_loop();
 

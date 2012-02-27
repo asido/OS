@@ -10,6 +10,7 @@
  */
 
 #include <libc.h>
+#include <shell.h>
 #include <x86/cpu.h>
 #include <x86/i8259.h>
 
@@ -558,7 +559,7 @@ static void handle_make_code(short code)
     if (_caps_on)
         c = caps_effect(c);
 
-    putchar(c);
+    shell_kbrd_cb(c);
 }
 
 static void handle_break_code(short code)

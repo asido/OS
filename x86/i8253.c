@@ -40,12 +40,7 @@ static unsigned int pit_mod(unsigned long long jiffy, unsigned int mod_val)
  */
 void x86_i8253_irq_do_handle()
 {
-    cursor_save();
-    goto_xy(0, 0);
     pit_jiffy++;
-    printf("%d", pit_jiffy);
-    cursor_load();
-
     update_clock_pit(PIT_HZ);
     check_callbacks();
 

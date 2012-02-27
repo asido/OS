@@ -12,5 +12,6 @@
 #define SHELL_FOOTER 2 /* 0010 */
 
 int shell_init(char *prmpt);
+void shell_kbrd_cb(char c);
 
 #endif /* end of include guard: SHELL_IA938IEU */
