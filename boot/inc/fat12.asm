@@ -277,13 +277,11 @@ _GET_INDEX_VALUE:
     je .Even
     ; FAT entry = 12 bits (one and a half byte)
 .Odd:
-    ; movzx ax, al
     add si, ax
     mov ax, WORD [es:si]
     shr ax, 4
     jmp .Return
 .Even:
-    ; movzx ax, al
     add si, ax
     mov ax, WORD [es:si]
     and ax, 0xFFF   ; 0000111111111111

@@ -13,8 +13,6 @@
 #include "shell.h"
 #include "linklist.h"
 
-/* static char* logo = ""; */
-
 static int screen_init()
 {
     set_color(VID_CLR_LIGHT_BLUE, VID_CLR_WHITE);
