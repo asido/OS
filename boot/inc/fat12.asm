@@ -259,6 +259,7 @@ _LOGICAL_TO_PHYSICAL:
 _GET_INDEX_VALUE:
     push bp
     mov bp, sp
+    push dx
     push bx
     push si
     mov si, WORD [FATLoadOffset]
@@ -269,19 +270,20 @@ _GET_INDEX_VALUE:
     mov ax, WORD [bp+4]
     mov bx, 3
     imul ax, bx
-    mov bl, 2
-    div bl
-    or ah, ah
+    xor dx, dx
+    mov bx, 2
+    div bx
+    or dx, dx
     je .Even
     ; FAT entry = 12 bits (one and a half byte)
 .Odd:
-    movzx ax, al
+    ; movzx ax, al
     add si, ax
     mov ax, WORD [es:si]
     shr ax, 4
     jmp .Return
 .Even:
-    movzx ax, al
+    ; movzx ax, al
     add si, ax
     mov ax, WORD [es:si]
     and ax, 0xFFF   ; 0000111111111111
@@ -290,6 +292,7 @@ _GET_INDEX_VALUE:
     pop es
     pop si
     pop bx
+    pop dx
     leave
     ret 2
 

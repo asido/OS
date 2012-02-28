@@ -151,7 +151,9 @@ void x86_gpf_except()
  */
 void x86_page_fault_except()
 {
-    kernel_panic("page fault");
+    __asm__ __volatile__("movl %%cr2, %%eax" : : : "eax");
+    
+    kernel_panic("page fault ");
 }
 
 /* IRQ 15 is reserved */

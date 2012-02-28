@@ -66,15 +66,15 @@ void cursor_load()
     _color = _color_save;
 }
 
-/* void color_save() */
-/* { */
-/*     _color_save = _color; */
-/* } */
-/*  */
-/* void color_load() */
-/* { */
-/*     _color = _color_save; */
-/* } */
+void color_save()
+{
+    _color_save = _color;
+}
+
+void color_load()
+{
+    _color = _color_save;
+}
 
 /*
  * Sets memory location at `dest` to `val` for `count` bytes.

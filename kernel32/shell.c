@@ -47,12 +47,10 @@ static int set_prompt(char *prmpt)
  */
 static void prompt_draw()
 {
-    /* color_save(); */
-    /* cursor_save(); */
+    color_save();
     set_color(SHELL_PROMPT_BG, SHELL_PROMPT_FG);
     printf("%s", prompt);
-    set_color(SHELL_CLR_BG, SHELL_CLR_FG);
-    /* color_load(); */
+    color_load();
 }
 
 /*

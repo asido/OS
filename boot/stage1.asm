@@ -337,7 +337,7 @@ LOADER_MAIN:
         call LOAD_STAGE2
 
         ; Done! Jump to STAGE2 ^^
-        push WORD [Stage2LoadLoc]   ; IP register..
+        push WORD 0x0050;WORD [Stage2LoadLoc]   ; IP register..
         push WORD 0x0000    ; and code segment for..
         retf                ; far jump
 

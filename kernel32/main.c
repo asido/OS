@@ -13,7 +13,7 @@
 #include "shell.h"
 #include "linklist.h"
 
-static char* logo = "";
+/* static char* logo = ""; */
 
 static int screen_init()
 {
