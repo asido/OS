@@ -13,7 +13,7 @@
 
 
 /* interrupt jiffy */
-unsigned long long pit_jiffy = 5;
+unsigned long long pit_jiffy = 0;
 
 /*
  * 64 bit mod operation.

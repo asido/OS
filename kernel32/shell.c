@@ -217,8 +217,9 @@ int shell_init(char *prmpt)
 
     /* 4KB hopefully is enough */
     shell.cmd_buf = (char *) kalloc(4000);
-    shell.frame.top = 1;
-    shell.frame.bottom = MAX_CRS_Y - 3;
+    shell.frame.top = 1;    /* leave space for header/footer */
+    shell.frame.bottom = MAX_CRS_Y - 1;
+    activate_frame(&shell.frame);
 
     /* simulate Enter press to show the prompt */
     shell_kbrd_cb('\r');

@@ -270,6 +270,8 @@ int activate_frame(struct frame_t *frame)
 int disable_frame()
 {
     cur_frame = NULL;
+
+    return 0;
 }
 
 /*
@@ -278,6 +280,38 @@ int disable_frame()
 struct frame_t *get_cur_frame()
 {
     return cur_frame;
+}
+
+/*
+ * Scrolls the text by `ln_cnt` using the provided frame.
+ */
+static int do_scroll(struct frame_t *frm, size_t ln_cnt)
+{
+    size_t crs_diff, i;
+    int frame_loc_start, frame_loc_end;
+    int new_frame_start;
+    short *dest, *src;
+    size_t sz;
+
+    /* calculate frame cursor zone */
+    frame_loc_start = frm->top * MAX_CRS_X;
+    frame_loc_end = frm->bottom * MAX_CRS_X;
+    new_frame_start = frame_loc_start + (ln_cnt * MAX_CRS_X);
+    crs_diff = new_frame_start - frame_loc_start;
+
+    /* move everything up by `ln_cnt` */
+    dest = &((short *) VIDEO_MEMORY)[frame_loc_start];
+    src = &((short *) VIDEO_MEMORY)[new_frame_start];
+    sz = (frame_loc_end - crs_diff) * sizeof(short);
+    memcpy((void *) dest, (void *) src, sz);
+
+    /* clean the visible space which got shifted up */
+    for (i = frame_loc_end - (ln_cnt * MAX_CRS_X); i < frame_loc_end; i++)
+        ((short *) VIDEO_MEMORY)[i] = CHAR_TO_MEMVAL(' ');
+
+    _cursor_loc -= _cursor_loc % MAX_CRS_X;
+
+    return 0;
 }
 
 /*
@@ -293,15 +327,15 @@ static int cursor_move(int cnt)
         return ABS(new_loc);
     }
 
-    int max_loc = MAX_CRS_X * MAX_CRS_Y;
-    if (new_loc > max_loc)
+    int max_loc = MAX_CRS_X * cur_frame->bottom;
+    if (new_loc >= max_loc)
     {
-        /* TODO: scrolling */
-        _cursor_loc = max_loc;
-        return max_loc - new_loc;
+        size_t ln_cnt = (new_loc - max_loc) / MAX_CRS_X + 1;
+        do_scroll(cur_frame, ln_cnt);
     }
+    else
+        _cursor_loc = new_loc;
 
-    _cursor_loc = new_loc;
     return 0;
 }
 
