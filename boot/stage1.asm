@@ -66,8 +66,8 @@ Stage2CurrentCluster:   dw 0x0000
 Stage2FileNotFoundMsg:  db "FATAL**: Missing or corrupt STAGE2 image.",0
 
 ; Loading addresses
-FatRootLoadLoc: dw 0x200    ; (7C00:0200)
-Stage2LoadLoc:  dw 0x050    ; (0050:0000)
+FatRootLoadLoc: dw 0x0200   ; (7C00:0200)
+Stage2LoadLoc:  dw 0x0050   ; (0050:0000)
 ;------------------------------------------------------------------------------
 ;   END OF DATA SECTION
 ;------------------------------------------------------------------------------

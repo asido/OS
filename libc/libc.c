@@ -13,6 +13,8 @@ static char _color = 0;
 static int _cursor_save = 0;
 static char _color_save = 0;
 
+static struct frame_t *cur_frame = NULL;
+
 static int cursor_move(int cnt);
 static int cursor_move_line(int cnt);
 static int _puts(const char *text);
@@ -20,7 +22,6 @@ static inline void put_tab();
 
 #define CHAR_TO_MEMVAL(chr) \
         ((chr) | (_color << 8))
-
 
 /*
  * Clears the screen with background colors
@@ -250,6 +251,33 @@ int printf(const char *format, ...)
 
     va_end(list);
     return i;
+}
+
+/*
+ * Sets a frame to the screen, so that when printing text, the
+ * text going to scroll based on current frame.
+ */
+int activate_frame(struct frame_t *frame)
+{
+    cur_frame = frame;
+
+    return 0;
+}
+
+/*
+ * Disables a frame. Generally speaking this disables scrolling.
+ */
+int disable_frame()
+{
+    cur_frame = NULL;
+}
+
+/*
+ * Gets current frame.
+ */
+struct frame_t *get_cur_frame()
+{
+    return cur_frame;
 }
 
 /*

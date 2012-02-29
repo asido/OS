@@ -29,6 +29,10 @@
 #define EOF (-1)
 #define TAB_SIZE 4
 
+struct frame_t {
+    unsigned int top;
+    unsigned int bottom;
+};
 
 /* std functions */
 int putchar(int c);
@@ -50,7 +54,8 @@ void cursor_save();
 void cursor_load();
 void color_save();
 void color_load();
-void set_frame(int top, int bottom);
+int activate_frame(struct frame_t *frame);
+int disable_frame();
 void set_color(unsigned char backgrnd, unsigned char forgrnd);
 void clear_screen();
 

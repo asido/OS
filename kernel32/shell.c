@@ -23,8 +23,13 @@ extern int info_main(int argc, const char *argv[]);
 #define SHELL_PROMPT_BG SHELL_CLR_BG
 #define SHELL_PROMPT_FG VID_CLR_WHITE
 
-static char *prompt;
-static char *cmd_buf;
+struct shell_t {
+    char *prompt;
+    char *cmd_buf;
+    struct frame_t frame;
+};
+
+static struct shell_t shell;
 
 /*
  * Sets shell prompt string.
@@ -37,7 +42,7 @@ static int set_prompt(char *prmpt)
         return -error;
     }
 
-    prompt = prmpt;
+    shell.prompt = prmpt;
 
     return 0;
 }
@@ -49,7 +54,7 @@ static void prompt_draw()
 {
     color_save();
     set_color(SHELL_PROMPT_BG, SHELL_PROMPT_FG);
-    printf("%s", prompt);
+    printf("%s", shell.prompt);
     color_load();
 }
 
@@ -157,8 +162,8 @@ void shell_kbrd_cb(char c)
     if (c == '\r')
     {
         putchar(c);
-        cmd_buf[kbrd_idx] = '\0';
-        exec_cmd(cmd_buf);
+        shell.cmd_buf[kbrd_idx] = '\0';
+        exec_cmd(shell.cmd_buf);
         kbrd_idx = 0;
         prompt_draw();
     }
@@ -168,13 +173,13 @@ void shell_kbrd_cb(char c)
         {
             putchar(c);
             kbrd_idx--;
-            cmd_buf[kbrd_idx] = '\0';
+            shell.cmd_buf[kbrd_idx] = '\0';
         }
     }
     else
     {
         putchar(c);
-        cmd_buf[kbrd_idx] = c;
+        shell.cmd_buf[kbrd_idx] = c;
         kbrd_idx++;
     }
 }
@@ -211,7 +216,9 @@ int shell_init(char *prmpt)
     puts("Welcome to AxidOS! Type 'help' for help.");
 
     /* 4KB hopefully is enough */
-    cmd_buf = (char *) kalloc(4000);
+    shell.cmd_buf = (char *) kalloc(4000);
+    shell.frame.top = 1;
+    shell.frame.bottom = MAX_CRS_Y - 3;
 
     /* simulate Enter press to show the prompt */
     shell_kbrd_cb('\r');

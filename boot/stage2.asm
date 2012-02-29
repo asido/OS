@@ -133,25 +133,9 @@ STAGE3:
     call KRNL_SIZE_TO_INT32
     mov DWORD [KernelImgSize], eax
 
-    ; calcluate kernels size in bytes
-    mov eax, DWORD [KernelImgSize]
-    movzx ecx, WORD [BytesPerSector]
-    mul ecx
-    ; copy kernel to 1st meg
-    push eax
-    push KERNEL_PMODE_BASE
+    ; load the kernel
     push KERNEL_RMODE_BASE
-    call MEM_COPY
-
-    ; validate kernel's executable
-    push KERNEL_PMODE_BASE
-    call VALIDATE_ELF
-    or eax, eax
-    jne .Error32
-
-    ; Calculate kernel's entry point
-    push KERNEL_PMODE_BASE
-    call GET_ELF_ENTRY
+    call LOAD_ELF
 
     ; and execute it!
     cli

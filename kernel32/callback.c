@@ -2,7 +2,7 @@
 #include "callback.h"
 #include "mm.h"
 
-struct callback_t *cb_list = 0;
+static struct callback_t *cb_list = NULL;
 
 int register_callback(enum cb_type type,
         struct time_t *delay, cb_func_t *callback)
