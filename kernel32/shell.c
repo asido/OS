@@ -58,6 +58,23 @@ static void prompt_draw()
     color_load();
 }
 
+static void clock_redraw()
+{
+    cursor_save();
+    set_color(SHELL_HEAD_CLR_BG, SHELL_HEAD_CLR_FG);
+    goto_xy(71, 0);
+    if (hw_time.hour < 10)
+        putchar('0');
+    printf("%d:", hw_time.hour);
+    if (hw_time.min < 10)
+        putchar('0');
+    printf("%d:", hw_time.min);
+    if (hw_time.sec < 10)
+        putchar('0');
+    printf("%d", hw_time.sec);
+    cursor_load();
+}
+
 /*
  * Redraws the header.
  */
@@ -75,9 +92,7 @@ static void header_redraw()
     goto_xy(1, 0);
     printf("Welcome to AxidOS");
 
-    goto_xy(63, 0);
-    printf("day: %d | %d:%d:%d",
-            hw_time.day, hw_time.hour, hw_time.min, hw_time.sec);
+    clock_redraw();
 
     cursor_load();
 }
@@ -189,7 +204,7 @@ void shell_kbrd_cb(char c)
  */
 static void update_time_cb(void *data)
 {
-    header_redraw();
+    clock_redraw();
 }
 
 /*
