@@ -41,20 +41,6 @@
 
 #define CMOS_SHUTDOWN_STATUS 0xF
 
-/* Write data */
-#define CMOS_DISKETTE 0x10
-/* Read data */
-#define CMOS_DISKETTE_NO_DRIVE 0x0
-#define CMOS_DISKETTE_360k 0x1
-#define CMOS_DISKETTE_1M2 0x2
-#define CMOS_DISKETTE_720k 0x3
-#define CMOS_DISKETTE_1M44 0x4
-/* Checking */
-#define CMOS_DISKETTE_TYPE_DRIVE0(data) \
-    (((data) >> 4) & 0xF)
-#define CMOS_DISKETTE_TYPE_DRIVE1(data) \
-    ((data) & 0xF)
-
 #define BCD_TO_INT(bcd) \
     (((((bcd) & 0xF0) >> 4) * 10) + ((bcd) & 0xF))
 
@@ -107,6 +93,19 @@ static int cmos_diagnostic()
     ram = NMI_DISABLE(ram);
     cmos_select_ram(ram);
 
+    return cmos_read_ram();
+}
+
+/*
+ * Returns the number of floppy drives attached to the PC.
+ */
+int cmos_get_flp_status()
+{
+    char ram;
+
+    ram = NMI_DISABLE(CMOS_DISKETTE);
+    cmos_write_ram(ram);
+    cmos_select_ram(ram);
     return cmos_read_ram();
 }
 

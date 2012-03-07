@@ -38,5 +38,6 @@ struct time_t *time_add_time(struct time_t *t1, struct time_t *t2);
 milis_t time_to_milis(struct time_t *t);
 milis_t get_cur_milis();
 void clock_init();
+void msdelay(unsigned int delay);
 
 #endif /* end of include guard: TIME_Q0HBOH0O */

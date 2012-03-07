@@ -112,7 +112,7 @@ static void footer_redraw()
         putchar(' ');
 
     goto_xy(1, MAX_CRS_Y - 1);
-    printf("Developed for UCN 3rd semester specialization project.");
+    printf("Developed for UCN 4th semester specialization project.");
 
     cursor_load();
 }

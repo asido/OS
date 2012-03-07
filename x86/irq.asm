@@ -43,6 +43,8 @@ global x86_i8253_irq_handle
 extern x86_i8253_irq_do_handle
 global x86_kbr_irq_handle
 extern x86_kbr_irq_do_handle
+global x86_floppy_irq_handle
+extern x86_floppy_irq_do_handle
 
 section .text
 align 4
@@ -118,3 +120,6 @@ x86_i8253_irq_handle:
 
 x86_kbr_irq_handle:
     HANDLE x86_kbr_irq_do_handle
+
+x86_floppy_irq_handle:
+    HANDLE x86_floppy_irq_do_handle

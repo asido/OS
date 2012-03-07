@@ -9,6 +9,7 @@
  *          Author: Arvydas Sidorenko
  ******************************************************************************/
 
+#include <x86/i8253.h>
 #include "time.h"
 
 /* Conversion macros */
@@ -145,4 +146,19 @@ milis_t get_cur_milis()
 void clock_init()
 {
     update_clock_hw(&hw_time);
+}
+
+/*
+ * Delay routine which busy loops for a given number of milliseconds.
+ */
+void msdelay(unsigned int delay)
+{
+    unsigned long long start_pit, end_pit, gap;
+
+    start_pit = pit_jiffy;
+    gap = delay / (1000 / PIT_HZ);
+    end_pit = start_pit + gap;
+
+    while (pit_jiffy < end_pit)
+        ;
 }

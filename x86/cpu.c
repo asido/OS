@@ -9,6 +9,7 @@
 #include "i8253.h"
 #include "idt.h"
 #include "cpu.h"
+#include "dma.h"
 
 /* CPU exception handlers defined in irq.asm */
 extern void x86_divide_handle();
@@ -31,6 +32,7 @@ extern void x86_coproc_handle();
 /* PIC interrupt handlers */
 extern void x86_i8253_irq_handle();
 extern void x86_kbr_irq_handle();
+extern void x86_floppy_irq_handle();
 
 extern int kbrd_init();
 
@@ -214,6 +216,8 @@ static int reg_pic_handlers()
         return -1;
     if (reg_irq(IRQ1_VECTOR, x86_kbr_irq_handle))
         return -1;
+    if (reg_irq(IRQ6_VECTOR, x86_floppy_irq_handle))
+        return -1;
 
     return 0;
 }
@@ -227,25 +231,49 @@ int x86_init()
     irq_disable();
     /* initialize PIC controller */
     if (i8259_init())
+    {
+        kernel_warning("Intel 8259 PIC controller failure");
         return -1;
+    }
     /* initialize PIT controller */
     if (i8253_init())
+    {
+        kernel_warning("Intel 8253 PIT controller failure");
         return -1;
+    }
     /* register interrupt handlers */
     if (reg_cpu_handlers())
+    {
+        kernel_warning("CPU handler registration failure");
         return -1;
+    }
     if (reg_pic_handlers())
+    {
+        kernel_warning("PIC handler registration failure");
         return -1;
-    /* initialize keyboard driver */
-    if (kbrd_init())
-        return -1;
-
+    }
     /* install IDT */
     if (install_idt())
+    {
+        kernel_warning("IDT initialization failure");
         return -1;
-    /* and enable interrupts */
+    }
+    /* handlers are set - enable interrupts */
     irq_enable();
     
+    /* initialize DMA */
+    if (dma_init())
+    {
+        kernel_warning("DMA initialization failure");
+        return -1;
+    }
+
+    /* Non-critical initializations */
+    if (floppy_init())
+        kernel_warning("Floppy initialization failure.");
+    if (kbrd_init())
+        kernel_warning("Keyboard initialization failure.");
+
     return 0;
 }
 

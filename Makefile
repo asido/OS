@@ -24,10 +24,25 @@ export ASFLAGS	=
 
 # C compiler
 export CC		= gcc
+
 # Don't use -O2 optimization, it tripple faults the CPU !
-export CFLAGS	= -c -Wall -g -gstabs -Wextra -fno-builtin -nodefaultlibs -nostartfiles -nostdlib -m32 -mtune=pentium
+export CFLAGS	=	-c	\
+					-Wall	\
+					-g		\
+					-gstabs	\
+					-Wextra	\
+					-fno-builtin	\
+					-nodefaultlibs	\
+					-nostartfiles	\
+					-nostdlib	\
+					-m32	\
+					-mtune=pentium
+
 # libraries
-export CLIB		=  -I $(PWD) -I $(PWD)/libc -I $(PWD)/kernel32 -I $(PWD)/drivers/keyboard
+export CLIB		= 	-I $(PWD)	\
+					-I $(PWD)/libc	\
+					-I $(PWD)/kernel32	\
+					-I $(PWD)/drivers/keyboard
 
 # if 'werror=y' flag is specified, include -Werror flag for C compiler
 ifeq ($(werror),y)
@@ -53,7 +68,13 @@ default:
 	cd kernel32; make
 	cd apps; make
 	cd drivers/keyboard; make
-	$(LD) $(LDFLAGS) -o $(PROGRAM) libc/*.o drivers/keyboard/*.o x86/*.o kernel32/*.o apps/*.o
+	cd drivers/floppy; make
+	$(LD) $(LDFLAGS) -o $(PROGRAM)	libc/*.o	\
+									drivers/keyboard/*.o	\
+									drivers/floppy/*.o	\
+									x86/*.o		\
+									kernel32/*.o	\
+									apps/*.o
 	./floppy.sh
 
 # Full rule, which first cleans all the build files and then does the build from scratch

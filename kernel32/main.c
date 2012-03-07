@@ -13,6 +13,8 @@
 #include "shell.h"
 #include "linklist.h"
 
+extern void *read(void *buf, addr_t dev_loc, size_t cnt);
+
 static int screen_init()
 {
     set_color(VID_CLR_LIGHT_BLUE, VID_CLR_WHITE);
@@ -60,7 +62,8 @@ int kmain(struct boot_info bi)
     /* init PMM */
     addr_t pmm_tbl_loc = binfo->krnl_loc + KB_TO_BYTE(binfo->krnl_size);
     addr_t pmm_end = pmm_init(binfo->mem_size, pmm_tbl_loc);
-    int mem_avail_begin = MB_TO_BYTE(5); /* first 5MB reserved in boot loader */
+    /* first 5MB reserved in boot loader */
+    int mem_avail_begin = MB_TO_BYTE(5);
     int mem_avail_end = KB_TO_BYTE(binfo->mem_size);
     pmm_init_region(mem_avail_begin, mem_avail_end - mem_avail_begin);
     set_krnl_size(binfo->krnl_size * 512);
@@ -74,6 +77,9 @@ int kmain(struct boot_info bi)
 
     if (shell_init("[axidos]$ "))
         kernel_panic("Shell init error");
+
+    void *buf = kalloc(1024);
+    read(buf, 0x7700, 1000);
 
     os_loop();
 
