@@ -288,8 +288,8 @@ struct frame_t *get_cur_frame()
 static int do_scroll(struct frame_t *frm, size_t ln_cnt)
 {
     size_t crs_diff, i;
-    int frame_loc_start, frame_loc_end;
-    int new_frame_start;
+    unsigned int frame_loc_start, frame_loc_end;
+    unsigned int new_frame_start;
     short *dest, *src;
     size_t sz;
 

@@ -42,6 +42,8 @@ export CFLAGS	=	-c	\
 export CLIB		= 	-I $(PWD)	\
 					-I $(PWD)/libc	\
 					-I $(PWD)/kernel32	\
+					-I $(PWD)/fs	\
+					-I $(PWD)/drivers/floppy	\
 					-I $(PWD)/drivers/keyboard
 
 # if 'werror=y' flag is specified, include -Werror flag for C compiler

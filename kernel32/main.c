@@ -13,8 +13,6 @@
 #include "shell.h"
 #include "linklist.h"
 
-extern void *read(void *buf, addr_t dev_loc, size_t cnt);
-
 static int screen_init()
 {
     set_color(VID_CLR_LIGHT_BLUE, VID_CLR_WHITE);
@@ -52,8 +50,7 @@ int kmain(struct boot_info bi)
 
     binfo = &bi;
 
-    clock_init();
-
+    /* Architecture specific initialization */
     if (screen_init())
         kernel_panic("screen init error");
     if (x86_init())
@@ -72,14 +69,17 @@ int kmain(struct boot_info bi)
     if (vmm_init(binfo->mem_size, pmm_end))
         kernel_panic("VMM init error");
 
+    /* Driver initialization */
     if (cmos_init())
         kernel_panic("CMOS init error");
+    if (floppy_init())
+        kernel_warning("Floppy initialization failure.");
+    if (kbrd_init())
+        kernel_warning("Keyboard initialization failure.");
 
+    clock_init();
     if (shell_init("[axidos]$ "))
         kernel_panic("Shell init error");
-
-    void *buf = kalloc(1024);
-    read(buf, 0x7700, 1000);
 
     os_loop();
 

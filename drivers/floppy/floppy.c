@@ -6,9 +6,11 @@
 
 #include <libc.h>
 #include <error.h>
+#include <time.h>
 #include <x86/dma.h>
 #include <x86/i8259.h>
 #include <x86/cmos.h>
+#include <x86/cpu.h>
 
 /*
  * All floppy control registers.
@@ -223,7 +225,7 @@ static void set_motor_on(enum motor_delay delay)
     flp.cur_dor |= flp.dor_motor_reg;
     outportb(DOR_REG, flp.cur_dor);
 
-    if (delay = WAIT_MOTOR_SPIN)
+    if (delay == WAIT_MOTOR_SPIN)
         msdelay(300);
 }
 
@@ -279,7 +281,7 @@ static int cmd_should_read()
  */
 static int cmd_should_write()
 {
-    return get_flp_status() & MSR_DIR == 0;
+    return (get_flp_status() & MSR_DIR) == 0;
 }
 
 /*
@@ -323,7 +325,6 @@ static int flp_read_cmd()
 
 static void flp_recalibrate()
 {
-    int i;
     unsigned char st3;
 
 retry:
@@ -337,7 +338,7 @@ retry:
     flp_send_cmd(CMD_SENSE_INTERRUPT);
     st3 = flp_read_cmd();
     flp_read_cmd();
-    if (st3 != 0x20 | flp.drive_nr)
+    if ((0x20 | flp.drive_nr) != st3)
         goto retry;
 }
 
@@ -372,8 +373,6 @@ static void drive_init()
  */
 static void ctrl_reset()
 {
-    int i;
-
     flp.irq_received = 0;
     outportb(DATARATE_SELECT_REG, 0x80);
     flp_wait_irq();
@@ -476,7 +475,7 @@ static void *do_read_sector(struct chs_t *chs)
  * to provided `buf`.
  * The caller is responsible of allocating and de-allocating the buffer.
  */
-void *read(void *buf, addr_t dev_loc, size_t cnt)
+void *floppy_read(void *buf, addr_t dev_loc, size_t cnt)
 {
     struct chs_t chs;
     size_t read; /* keeps track of already read byte count */
@@ -493,13 +492,13 @@ void *read(void *buf, addr_t dev_loc, size_t cnt)
         if (seek_chs(&chs))
         {
             kernel_warning("floppy seek_chs failure");
-            return -1;
+            return NULL;
         }
 
         do_read_sector(&chs);
         offset = dev_loc % SECTOR_SIZE;
         step = MIN(SECTOR_SIZE - offset, cnt);
-        memcpy(buf, flp.dma.buf + offset, step);
+        memcpy(buf, (void *) (flp.dma.buf + offset), step);
     }
 
     set_motor_off(WAIT_MOTOR_SPIN);

@@ -268,12 +268,6 @@ int x86_init()
         return -1;
     }
 
-    /* Non-critical initializations */
-    if (floppy_init())
-        kernel_warning("Floppy initialization failure.");
-    if (kbrd_init())
-        kernel_warning("Keyboard initialization failure.");
-
     return 0;
 }
 
