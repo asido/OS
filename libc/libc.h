@@ -39,6 +39,7 @@ int putchar(int c);
 int puts(const char *text);
 int printf(const char *format, ...);
 int strcmp(const char* str1, const char* str2);
+char *strcat(char *dest, const char *src);
 size_t strlen(const char* str);
 void *memcpy(void *dest, const void *src, size_t num);
 void *memset(void *dest, int val, size_t count);

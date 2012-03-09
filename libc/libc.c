@@ -109,7 +109,9 @@ size_t strlen(const char* str)
 {
     int i = 0;
 
-    while (str[++i]);
+    while (str[i])
+        i++;
+
     return i;
 }
 
@@ -371,6 +373,29 @@ int strcmp(const char* str1, const char* str2)
     if (*str1)
         return 1;
     return -1;
+}
+
+/*
+ * Concatinates `src` to `dest` and returns `dest`.
+ * The caller is is responsible that `dest` has enough
+ * space allocated to have `src` appended.
+ * NOTE: the arguments are null-terminated char arrays.
+ */
+char *strcat(char *dest, const char *src)
+{
+    size_t i;
+    size_t start_point;
+
+    if (!dest || !src)
+        return NULL;
+    
+    start_point = strlen(dest);
+
+    for (i = start_point; *src; i++, src++)
+        dest[i] = *src;
+    dest[i] = '\0';
+
+    return dest;
 }
 
 /*
