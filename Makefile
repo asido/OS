@@ -68,6 +68,7 @@ default:
 	cd libc; make
 	cd x86; make
 	cd kernel32; make
+	cd fs; make
 	cd apps; make
 	cd drivers/keyboard; make
 	cd drivers/floppy; make
@@ -76,7 +77,8 @@ default:
 									drivers/floppy/*.o	\
 									x86/*.o		\
 									kernel32/*.o	\
-									apps/*.o
+									apps/*.o	\
+									fs/*.o
 	./floppy.sh
 
 # Full rule, which first cleans all the build files and then does the build from scratch

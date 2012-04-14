@@ -11,6 +11,9 @@
 #define SHELL_HEADER 1 /* 0001 */
 #define SHELL_FOOTER 2 /* 0010 */
 
+/* Limits */
+#define SHELL_MAX_ARGC		10
+
 int shell_init(char *prmpt);
 void shell_kbrd_cb(char c);
 

@@ -8,6 +8,7 @@
 #include <x86/cpu.h>
 #include <x86/i8259.h>
 #include <x86/cmos.h>
+#include <fs/vfs.h>
 #include "mm.h"
 #include "time.h"
 #include "shell.h"
@@ -76,6 +77,9 @@ int kmain(struct boot_info bi)
         kernel_warning("Floppy initialization failure.");
     if (kbrd_init())
         kernel_warning("Keyboard initialization failure.");
+
+	if (mount(STORAGE_DEVICE_FLOPPY, "floppy"))
+		kernel_warning("Floppy mount failure");
 
     clock_init();
     if (shell_init("[axidos]$ "))

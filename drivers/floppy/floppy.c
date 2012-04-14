@@ -11,6 +11,7 @@
 #include <x86/i8259.h>
 #include <x86/cmos.h>
 #include <x86/cpu.h>
+#include <fs/vfs.h>
 
 /*
  * All floppy control registers.
@@ -563,6 +564,17 @@ int floppy_init()
     set_motor_off(NO_WAIT_MOTOR_SPIN);
 
     return 0;
+}
+
+struct dev_driver *floppy_init_driver(struct dev_driver *driver)
+{
+    if (!driver)
+        return driver;
+
+    driver->read = floppy_read;
+    driver->write = NULL; /* TODO */
+
+    return driver;
 }
 
 void x86_floppy_irq_do_handle()

@@ -23,7 +23,7 @@ struct llist_t {
         /* since the list is empty, everything points to itself */  \
         (ptr)->ll_field.next = ((struct llist_t *) (ptr));     \
         (ptr)->ll_field.prev = ((struct llist_t *) (ptr));     \
-    } while (0);
+    } while (0)
 
 /*
  * Adds `data` before `ll_memb` in the linked list.
@@ -36,7 +36,7 @@ struct llist_t {
         /* merge it before a given `ll_memb` */     \
         (ll_memb)->ll_field.prev->next = &(data)->ll_field;    \
         (ll_memb)->ll_field.prev = &(data)->ll_field;  \
-    } while (0);
+    } while (0)
 
 /*
  * Retrieves the next element.
@@ -65,7 +65,7 @@ struct llist_t {
         (memb)->ll_field.next->prev = (memb)->ll_field.prev;     \
         (memb)->ll_field.next = NULL;    \
         (memb)->ll_field.prev = NULL;    \
-    } while (0);
+    } while (0)
 
 /*
  * Returns true if `memb` bellongs to any list.

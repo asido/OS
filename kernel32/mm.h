@@ -1,7 +1,7 @@
 #ifndef MM_ZPVRK7R1
 #define MM_ZPVRK7R1
 
-typedef unsigned int addr_t;
+#include <libc.h>
 
 struct boot_info {
     unsigned int mem_size;

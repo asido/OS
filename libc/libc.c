@@ -356,6 +356,21 @@ static int cursor_move_line(int cnt)
     return cursor_move(move_by);
 }
 
+/* 
+ * Returns a pointer to the first occurance of 'c'
+ */
+char *strchr(char *str, char c)
+{
+	while (*str)
+	{
+		if (*str == c)
+			return str;
+		str++;
+	}
+
+	return NULL;
+}
+
 /*
  * Compares 2 null terminated char arrays.
  * Returns 0 if they are equal, 1 if the first is great, -1 otherwise.
@@ -394,6 +409,28 @@ char *strcat(char *dest, const char *src)
     for (i = start_point; *src; i++, src++)
         dest[i] = *src;
     dest[i] = '\0';
+
+    return dest;
+}
+
+/*
+ * Copies a string pointed by `src` to `dest`.
+ * Caller is responsible for allocating enough space in `dest`.
+ * Same is valid to free it.
+ * Returns `dest`.
+ */
+char *strcpy(char *dest, const char *src)
+{
+    if (!dest || !src)
+        return NULL;
+
+    while (*src)
+    {
+        *dest = *src;
+        dest++;
+        src++;
+    }
+    *dest = '\0';
 
     return dest;
 }

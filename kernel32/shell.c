@@ -8,6 +8,7 @@
 #include <error.h>
 #include <callback.h>
 #include <mm.h>
+#include "shell.h"
 
 extern int info_main(int argc, const char *argv[]);
 
@@ -145,6 +146,53 @@ static void print_help()
     puts("\thelp - prints this help");
     puts("\tclear - clears the screen");
     puts("\tinfo - prints some info about the system");
+	puts("\tls [folder] - print folder content");
+}
+
+static char *get_cmd_token(char *cmd, size_t offset)
+{
+	char *start;
+	int in_bracket; // 1 = ' | 2 = "
+
+	cmd += offset * sizeof(char);
+
+	if (!cmd || *cmd == '\0')
+		return NULL;
+
+	while (*cmd == ' ')
+		cmd++;
+
+	if (*cmd == '\'')
+	{
+		in_bracket = 1;
+		cmd++;
+	}
+	else if (*cmd == '"')
+	{
+		in_bracket = 2;
+		cmd++;
+	}
+	else
+		in_bracket = 0;
+
+	start = cmd;
+	
+	while ((in_bracket || *cmd != ' ') && *cmd != '\0')
+	{
+		if ((*cmd == '\'' && in_bracket == 1) ||
+			(*cmd == '"' && in_bracket == 2))
+		{
+			*cmd = '\0';
+			break;
+		}
+
+		cmd++;
+	}
+
+	if (*cmd != '\0')
+		*cmd = '\0';
+
+	return start;
 }
 
 /*
@@ -152,13 +200,33 @@ static void print_help()
  */
 static int exec_cmd(char *cmd)
 {
-    if (strcmp(cmd, "help") == 0)
+	int argc = 0;
+	int offset = 0;
+	char **argv = (char **) kalloc(sizeof(char **) * SHELL_MAX_ARGC);
+
+	while (argv[argc] = get_cmd_token(cmd, offset))
+	{
+		offset += strlen(argv[argc]) + 1;
+		argc++;
+		if (argc > SHELL_MAX_ARGC)
+		{
+			printf("Too many arguments in command: %s\n", cmd);
+			return -1;
+		}
+	}
+
+	if (argc == 0)
+		return 0;
+
+    if (strcmp(argv[0], "help") == 0)
         print_help();
-    else if (strcmp(cmd, "clear") == 0)
+    else if (strcmp(argv[0], "clear") == 0)
         content_redraw();
-    else if (strcmp(cmd, "info") == 0)
-        info_main(1, &cmd);
-    else if (strcmp(cmd, "") != 0)
+    else if (strcmp(argv[0], "info") == 0)
+        info_main(argc, argv);
+	else if (strcmp(argv[0], "ls") == 0)
+		ls_main(argc, argv);
+    else if (strcmp(argv[0], "") != 0)
     {
         printf("  No such command: %s", cmd);
         puts("");

@@ -21,7 +21,7 @@ typedef enum {
     true
 } bool;
 
-
+typedef unsigned int addr_t;
 /* standard size_t type */
 typedef unsigned size_t;
 
