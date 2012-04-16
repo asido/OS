@@ -27,12 +27,12 @@
  */
 struct mount_point
 {
+	struct llist_t ll;
     /* Filename */
     char *name;
     /* A struct with storage device driver provided routines
      * to read and manipulate data on it. */
     struct fs_driver *fs_driver;
-    struct llist_t ll;
 };
 
 struct vfs
@@ -88,11 +88,13 @@ int mount(enum storage_dev_type dev_type, char *filename)
     }
 
     /* Add the mount point the the VFS directory pool */
-    llist_init(mount, ll);
     if (_vfs.mount_pts)
         llist_add_before(_vfs.mount_pts, mount, ll);
     else
+	{
+		llist_init(mount, ll);
         _vfs.mount_pts = mount;
+	}
 	_vfs.dir_count++;
 
     return 0;
@@ -141,32 +143,19 @@ int read(FILE *hndl, void *buf, size_t nbytes)
 	return -1;
 }
 
-char *get_mounts()
+char **get_mounts()
 {
 	int idx;
-	size_t len = 0;
 	struct mount_point *mount_point;
-	char *file_list;
+	char **file_list = (char **) kalloc(sizeof(char *) * 128);
+	file_list[0] = '\0';
 
 	if (_vfs.dir_count == 0)
-	{
-		file_list = (char *) kalloc(2);
-		file_list[0] = '\0';
-		file_list[1] = '\0';
 		return file_list;
-	}
 
 	llist_foreach(_vfs.mount_pts, mount_point, idx, ll)
-		len += strlen(mount_point->name) + 1;
-	len += 2; /* For the last double '\0' */
-
-	file_list = (char *) kalloc(len);
-	file_list[0] = '\0';
-	llist_foreach(_vfs.mount_pts, mount_point, idx, ll)
-		strcat(file_list, mount_point->name);
-
-	file_list[len - 1] = '\0';
-	file_list[len - 2] = '\0';
+		file_list[idx] = mount_point->name;
+	file_list[idx+1] = '\0';
 
 	return file_list;
 }

@@ -3,7 +3,7 @@
 
 int ls_main(int argc, char **argv)
 {
-	char *file_list;
+	char **file_list;
 	char *dir;
 
 	if (argc == 0)
@@ -18,8 +18,8 @@ int ls_main(int argc, char **argv)
 		return 1;
 	}
 
-	for (; file_list[0] != '\0' && file_list[1] != '\0'; file_list += strlen(file_list) + 1)
-		printf("%s\n", file_list);
+	for (; *file_list; file_list++)
+		printf("/%s\n", *file_list);
 
 	return 0;
 }
