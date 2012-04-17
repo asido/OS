@@ -143,28 +143,96 @@ int read(FILE *hndl, void *buf, size_t nbytes)
 	return -1;
 }
 
-char **get_mounts()
+struct fileinfo **get_mounts()
+{
+	struct fileinfo **inf;
+	struct mount_point *mnt_point;
+	size_t idx;
+
+	if (_vfs.dir_count == 0)
+		return inf;
+
+	inf = (struct fileinfo **) kalloc((_vfs.dir_count + 1) * sizeof(struct fileinfo *));
+
+	llist_foreach(_vfs.mount_pts, mnt_point, idx, ll)
+	{
+		inf[idx] = (struct fileinfo *) kalloc(sizeof(struct fileinfo));
+		inf[idx]->filename = mnt_point->name;
+		inf[idx]->size = 0;
+		inf[idx]->flags = 0 | VOLUME_LABEL;
+	}
+	inf[idx+1] = NULL;
+
+	return inf;
+}
+
+static struct fileinfo **get_dev_files(char *dir)
 {
 	int idx;
 	struct mount_point *mount_point;
-	char **file_list = (char **) kalloc(sizeof(char *) * 128);
-	file_list[0] = '\0';
+	char *mount_name = dir;
+	char *dir_name = strchr(mount_name, '/');
 
-	if (_vfs.dir_count == 0)
-		return file_list;
+	if (dir_name)
+	{
+		dir_name[0] = '\0';
+		dir_name++;
+	}
+	else
+		dir_name = "";
 
 	llist_foreach(_vfs.mount_pts, mount_point, idx, ll)
-		file_list[idx] = mount_point->name;
-	file_list[idx+1] = '\0';
-
-	return file_list;
-}
-
-char *get_file_list(const char *dir)
-{
-	/* Check if root director is requested */
-	if (!dir || strcmp(dir, "/") == 0)
-		return get_mounts();
+	{
+		if (strcmp(mount_point->name, mount_name) == 0)
+			return mount_point->fs_driver->ls(mount_point->fs_driver, dir_name);
+	}
 
 	return NULL;
+}
+
+struct fileinfo **get_file_list(const char *dir)
+{
+	struct fileinfo **files;
+
+	if (!dir)
+		return NULL;
+
+	/* Check if root director is requested */
+	if (strcmp(dir, "/") == 0)
+		files = get_mounts();
+	else
+	{
+		dir++; /* get rid of slash */
+		files = get_dev_files(dir);
+	}
+
+	return files;
+}
+
+struct fileinfo *alloc_fileinfo()
+{
+	struct fileinfo *inf = (struct fileinfo *) kalloc(sizeof(struct fileinfo));
+	if (!inf)
+	{
+		error = -ENOMEM;
+		return NULL;
+	}
+
+	inf->filename = (char *) kalloc(MAX_FILENAME_LENGTH);
+	if (!inf->filename)
+	{
+		error = -ENOMEM;
+		return NULL;
+	}
+
+	return inf;
+}
+
+void dealoc_fileinfo(struct fileinfo *inf)
+{
+	if (!inf)
+		return;
+
+	free(inf->filename);
+	free(inf);
 }

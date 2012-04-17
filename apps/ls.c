@@ -3,10 +3,11 @@
 
 int ls_main(int argc, char **argv)
 {
-	char **file_list;
+	struct fileinfo **file_list;
 	char *dir;
+	int i;
 
-	if (argc == 0)
+	if (argc == 1)
 		dir = "/";
 	else
 		dir = argv[1];
@@ -18,8 +19,16 @@ int ls_main(int argc, char **argv)
 		return 1;
 	}
 
-	for (; *file_list; file_list++)
-		printf("/%s\n", *file_list);
+	for (i = 0; file_list[i]; i++)
+	{
+		if (strcmp(dir, "/") != 0)
+			printf("%s", dir);
+		if (file_list[i]->filename[0] != '/')
+			putchar('/');
+		printf("%s\n", file_list[i]->filename);
+	}
+
+	free(file_list);
 
 	return 0;
 }
