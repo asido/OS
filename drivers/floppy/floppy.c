@@ -226,8 +226,8 @@ static void set_motor_on(enum motor_delay delay)
     flp.cur_dor |= flp.dor_motor_reg;
     outportb(DOR_REG, flp.cur_dor);
 
-    //if (delay == WAIT_MOTOR_SPIN)
-    //    msdelay(300);
+    if (delay == WAIT_MOTOR_SPIN)
+        msdelay(300);
 }
 
 /*
@@ -238,8 +238,8 @@ static void set_motor_off(enum motor_delay delay)
     flp.cur_dor &= ~flp.dor_motor_reg;
     outportb(DOR_REG, flp.cur_dor);
 
-    //if (delay == WAIT_MOTOR_SPIN)
-    //    msdelay(2000);
+    if (delay == WAIT_MOTOR_SPIN)
+        msdelay(2000);
 }
 
 /*

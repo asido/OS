@@ -211,7 +211,7 @@ static struct fileinfo **fs_ls(struct fs_driver *fs_drv, const char *dir)
 		rootdir_itm = &(((struct rootdir_item *) mount->rootdir_data)[i]);
 		if (!(rootdir_itm->flags & HIDDEN))
 		{
-			files[i] = alloc_fileinfo();
+            files[i] = alloc_fileinfo();
 			if (!files[i])
 			{
 				error = -ENOMEM;

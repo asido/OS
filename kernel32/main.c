@@ -16,9 +16,10 @@
 
 static int screen_init()
 {
-    set_color(VID_CLR_LIGHT_BLUE, VID_CLR_WHITE);
+    set_color(VID_CLR_BLACK, VID_CLR_LIGHT_BLUE);
     clear_screen();
-    goto_xy(0, 0);
+    goto_xy(30, 12);
+	printf("Loading AxidOS...");
 
     return 0;
 }
