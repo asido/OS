@@ -53,8 +53,8 @@ typedef unsigned size_t;
 #define B 1
 #define KB 1024
 #define MB ((KB) * (KB))
-#define GB ((MB) * (MB))
-#define TB ((GB) * (GB))
+#define GB ((MB) * (KB))
+#define TB ((GB) * (KB))
 #define BYTE_TO_KB(b)   ((b) / KB)
 #define KB_TO_MB(kb)    ((b) / KB)
 #define BYTE_TO_MB(b)   (KB_TO_MB(BYTE_TO_KB((b))))
